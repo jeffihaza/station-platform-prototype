@@ -3,7 +3,7 @@ import React, { useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   Radio, Play, Pause, Upload, Mic2, Headphones, CalendarDays,
-  ArrowRight, Signal, Lock, Library
+  Signal, Lock, Library
 } from "lucide-react";
 import "./styles.css";
 
@@ -37,8 +37,6 @@ function App() {
 }
 
 function StationLanding({ setView }) {
-  const [playing, setPlaying] = useState(false);
-
   return (
     <main className="stationPage">
       <nav className="nav">
@@ -66,12 +64,23 @@ function StationLanding({ setView }) {
             archives, and show information coming soon.
           </p>
           <div className="heroActions">
-            <button className="primary" onClick={() => setPlaying(!playing)}>
-              {playing ? <Pause size={18} /> : <Play size={18} />}
-              {playing ? "Pause Preview" : "Play Preview"}
-            </button>
+            <audio
+              controls
+              preload="none"
+              style={{
+                width: "100%",
+                maxWidth: "480px",
+                marginTop: "16px"
+              }}
+            >
+              <source
+                src="http://137.184.158.254/listen/123_radio/radio.mp3"
+                type="audio/mpeg"
+              />
+            </audio>
+
             <button className="secondary" onClick={() => setView("booth")}>
-              DJ Login <ArrowRight size={18} />
+              DJ Login
             </button>
           </div>
         </div>
@@ -82,8 +91,8 @@ function StationLanding({ setView }) {
           </div>
           <div className="cardMeta">
             <p>Channel 1</p>
-            <h2>Programming TBA</h2>
-            <span>Live schedule coming soon</span>
+            <h2>123 Radio Live Stream</h2>
+            <span>Broadcasting live for the love.</span>
           </div>
         </div>
       </section>
