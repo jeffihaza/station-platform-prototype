@@ -1,0 +1,450 @@
+
+import React, { useRef, useState } from "react";
+import { createRoot } from "react-dom/client";
+import {
+  Radio,
+  Play,
+  Pause,
+  Upload,
+  Mic2,
+  Headphones,
+  CalendarDays,
+  ArrowRight,
+  Signal,
+  Lock,
+  Library,
+  Users,
+} from "lucide-react";
+import "./styles.css";
+
+const shows = [
+  {
+    time: "12:00",
+    title: "Morning Frequencies",
+    host: "Maya N.",
+    city: "New York",
+    tags: ["ambient", "jazz", "field recordings"],
+  },
+  {
+    time: "14:00",
+    title: "Low-End Theory Office Hours",
+    host: "Jules",
+    city: "London",
+    tags: ["club", "rap", "bass"],
+  },
+  {
+    time: "16:00",
+    title: "After School Special",
+    host: "No Signal Team",
+    city: "Los Angeles",
+    tags: ["leftfield pop", "r&b"],
+  },
+  {
+    time: "18:00",
+    title: "Guest Transmission",
+    host: "Open Decks",
+    city: "Remote",
+    tags: ["guest mix", "live"],
+  },
+];
+
+const archives = [
+  ["Steel Tones", "Detroit", "techno / electro"],
+  ["Soft Static", "Brooklyn", "ambient / spoken word"],
+  ["Palm Wine Computer", "Lagos", "highlife / digital"],
+  ["Night Bus Home", "London", "garage / dub"],
+  ["Weather Report", "Tokyo", "city pop / jazz"],
+  ["Basement Service", "Atlanta", "rap / soul"],
+];
+
+function makeDeck(audioContext, sourceNode) {
+  const gain = audioContext.createGain();
+  const low = audioContext.createBiquadFilter();
+  const mid = audioContext.createBiquadFilter();
+  const high = audioContext.createBiquadFilter();
+
+  low.type = "lowshelf";
+  low.frequency.value = 320;
+
+  mid.type = "peaking";
+  mid.frequency.value = 1200;
+  mid.Q.value = 1;
+
+  high.type = "highshelf";
+  high.frequency.value = 3200;
+
+  sourceNode.connect(low);
+  low.connect(mid);
+  mid.connect(high);
+  high.connect(gain);
+
+  return { gain, low, mid, high };
+}
+
+function App() {
+  const [view, setView] = useState("station");
+  return view === "station" ? <StationLanding setView={setView} /> : <CreatorBooth setView={setView} />;
+}
+
+function StationLanding({ setView }) {
+  const [playing, setPlaying] = useState(false);
+
+  return (
+    <main className="stationPage">
+      <nav className="nav">
+        <button className="wordmark" onClick={() => setView("station")}>
+          SIGNAL ROOM
+        </button>
+        <div className="navLinks">
+          <a>Live</a>
+          <a>Schedule</a>
+          <a>Archive</a>
+          <button onClick={() => setView("booth")} className="navButton">
+            Broadcast
+          </button>
+        </div>
+      </nav>
+
+      <section className="hero">
+        <div className="heroCopy">
+          <div className="liveTag">
+            <span></span> Live Now
+          </div>
+          <h1>Independent radio, broadcasting from wherever the room is.</h1>
+          <p>
+            A 24/7 station homepage for listeners, residents, and remote DJs. Built around live programming,
+            guest transmissions, and an archive that feels like a record shop wall.
+          </p>
+          <div className="heroActions">
+            <button className="primary" onClick={() => setPlaying(!playing)}>
+              {playing ? <Pause size={18} /> : <Play size={18} />}
+              {playing ? "Pause Live" : "Play Live"}
+            </button>
+            <button className="secondary" onClick={() => setView("booth")}>
+              Open Creator Booth <ArrowRight size={18} />
+            </button>
+          </div>
+        </div>
+
+        <div className="liveCard">
+          <div className="artwork">
+            <Signal size={58} />
+          </div>
+          <div className="cardMeta">
+            <p>Channel 1</p>
+            <h2>Morning Frequencies</h2>
+            <span>Maya N. · New York · ambient / jazz / field recordings</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="channelGrid">
+        <div className="channel active">
+          <p>Channel 1</p>
+          <h3>Live Radio</h3>
+          <span>Primary station feed</span>
+        </div>
+        <div className="channel">
+          <p>Channel 2</p>
+          <h3>Guest Stream</h3>
+          <span>Remote creator takeovers</span>
+        </div>
+        <div className="channel">
+          <p>Fallback</p>
+          <h3>LibreTime Automation</h3>
+          <span>Scheduled playout when nobody is live</span>
+        </div>
+      </section>
+
+      <section className="split">
+        <div>
+          <div className="sectionTitle">
+            <CalendarDays size={21} />
+            <h2>Coming Up</h2>
+          </div>
+          <div className="schedule">
+            {shows.map((show) => (
+              <div className="scheduleRow" key={show.title}>
+                <strong>{show.time}</strong>
+                <div>
+                  <h3>{show.title}</h3>
+                  <p>{show.host} · {show.city}</p>
+                </div>
+                <span>{show.tags.join(" / ")}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <aside className="creatorPanel">
+          <Lock size={22} />
+          <h2>Broadcast From Anywhere</h2>
+          <p>
+            Send DJs a private creator link. They can load files, use an external audio interface,
+            mix two decks, and push the final feed into your station ingest.
+          </p>
+          <button className="primary full" onClick={() => setView("booth")}>
+            Enter Booth
+          </button>
+        </aside>
+      </section>
+
+      <section>
+        <div className="sectionTitle">
+          <Library size={21} />
+          <h2>Recent Broadcasts</h2>
+        </div>
+        <div className="archiveGrid">
+          {archives.map(([title, city, tags], i) => (
+            <article className="archiveCard" key={title}>
+              <div className="miniArt">{String(i + 1).padStart(2, "0")}</div>
+              <h3>{title}</h3>
+              <p>{city}</p>
+              <span>{tags}</span>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <footer className="footer">
+        <div>
+          <h2>SIGNAL ROOM</h2>
+          <p>Public site + remote creator booth prototype.</p>
+        </div>
+        <button className="secondary" onClick={() => setView("booth")}>
+          DJ Login
+        </button>
+      </footer>
+    </main>
+  );
+}
+
+function Deck({ name, side, onFile, onPlayPause, playing, onGain, onEq }) {
+  return (
+    <section className="deck">
+      <div className="deckHeader">
+        <div>
+          <p className="eyebrow">{side}</p>
+          <h2>{name}</h2>
+        </div>
+        <label className="upload">
+          <Upload size={17} />
+          Load Track
+          <input type="file" accept="audio/*" onChange={onFile} />
+        </label>
+      </div>
+
+      <button className="transport" onClick={onPlayPause}>
+        {playing ? <Pause size={20} /> : <Play size={20} />}
+        {playing ? "Pause" : "Play"}
+      </button>
+
+      <div className="controls">
+        <label>
+          Volume
+          <input type="range" min="0" max="1" step="0.01" defaultValue="0.8" onChange={(e) => onGain(+e.target.value)} />
+        </label>
+        <label>
+          Lows
+          <input type="range" min="-24" max="24" step="1" defaultValue="0" onChange={(e) => onEq("low", +e.target.value)} />
+        </label>
+        <label>
+          Mids
+          <input type="range" min="-24" max="24" step="1" defaultValue="0" onChange={(e) => onEq("mid", +e.target.value)} />
+        </label>
+        <label>
+          Highs
+          <input type="range" min="-24" max="24" step="1" defaultValue="0" onChange={(e) => onEq("high", +e.target.value)} />
+        </label>
+      </div>
+    </section>
+  );
+}
+
+function CreatorBooth({ setView }) {
+  const ctxRef = useRef(null);
+  const audioEls = useRef({ a: null, b: null });
+  const deckRefs = useRef({ a: null, b: null });
+  const masterRef = useRef(null);
+  const destRef = useRef(null);
+  const micRef = useRef(null);
+  const [playing, setPlaying] = useState({ a: false, b: false });
+  const [micOn, setMicOn] = useState(false);
+  const [broadcasting, setBroadcasting] = useState(false);
+  const [status, setStatus] = useState("Offline / local preview");
+
+  function ensureAudio() {
+    if (!ctxRef.current) {
+      const ctx = new AudioContext();
+      const master = ctx.createGain();
+      const destination = ctx.createMediaStreamDestination();
+
+      master.gain.value = 0.9;
+      master.connect(ctx.destination);
+      master.connect(destination);
+
+      ctxRef.current = ctx;
+      masterRef.current = master;
+      destRef.current = destination;
+    }
+    return ctxRef.current;
+  }
+
+  function loadFile(deck, file) {
+    const ctx = ensureAudio();
+    if (!file) return;
+
+    if (!audioEls.current[deck]) {
+      const audio = new Audio();
+      audio.crossOrigin = "anonymous";
+      const source = ctx.createMediaElementSource(audio);
+      const deckChain = makeDeck(ctx, source);
+      deckChain.gain.connect(masterRef.current);
+      audioEls.current[deck] = audio;
+      deckRefs.current[deck] = deckChain;
+    }
+
+    audioEls.current[deck].src = URL.createObjectURL(file);
+    audioEls.current[deck].load();
+    setStatus(`${deck.toUpperCase()} loaded: ${file.name}`);
+  }
+
+  async function togglePlay(deck) {
+    const ctx = ensureAudio();
+    await ctx.resume();
+    const audio = audioEls.current[deck];
+    if (!audio) {
+      setStatus(`Load a track into Deck ${deck.toUpperCase()} first.`);
+      return;
+    }
+
+    if (audio.paused) {
+      await audio.play();
+      setPlaying((p) => ({ ...p, [deck]: true }));
+    } else {
+      audio.pause();
+      setPlaying((p) => ({ ...p, [deck]: false }));
+    }
+  }
+
+  function setDeckGain(deck, value) {
+    const chain = deckRefs.current[deck];
+    if (chain) chain.gain.gain.value = value;
+  }
+
+  function setDeckEq(deck, band, value) {
+    const chain = deckRefs.current[deck];
+    if (!chain) return;
+    if (band === "low") chain.low.gain.value = value;
+    if (band === "mid") chain.mid.gain.value = value;
+    if (band === "high") chain.high.gain.value = value;
+  }
+
+  function crossfade(value) {
+    const a = deckRefs.current.a;
+    const b = deckRefs.current.b;
+    const x = +value;
+    if (a) a.gain.gain.value = Math.cos(x * Math.PI / 2);
+    if (b) b.gain.gain.value = Math.cos((1 - x) * Math.PI / 2);
+  }
+
+  async function toggleMic() {
+    const ctx = ensureAudio();
+    await ctx.resume();
+
+    if (micOn && micRef.current) {
+      micRef.current.stream.getTracks().forEach((t) => t.stop());
+      micRef.current.node.disconnect();
+      micRef.current = null;
+      setMicOn(false);
+      setStatus("External input off");
+      return;
+    }
+
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const node = ctx.createMediaStreamSource(stream);
+    const gain = ctx.createGain();
+    gain.gain.value = 0.85;
+    node.connect(gain);
+    gain.connect(masterRef.current);
+    micRef.current = { stream, node, gain };
+    setMicOn(true);
+    setStatus("External input live");
+  }
+
+  function fakeBroadcast() {
+    ensureAudio();
+    setBroadcasting((b) => !b);
+    setStatus(!broadcasting ? "Broadcast simulation on — WebRTC/Icecast backend not connected yet" : "Broadcast simulation stopped");
+  }
+
+  return (
+    <main className="boothPage">
+      <header className="topbar">
+        <button className="backButton" onClick={() => setView("station")}>← Station Site</button>
+        <div className="brand">
+          <Radio />
+          <div>
+            <h1>Creator Booth</h1>
+            <p>Remote broadcast console</p>
+          </div>
+        </div>
+        <div className={broadcasting ? "livePill onAir" : "livePill"}>{broadcasting ? "ON AIR SIM" : "LOCAL PREVIEW"}</div>
+      </header>
+
+      <div className="grid">
+        <Deck
+          name="Deck A"
+          side="Source One"
+          playing={playing.a}
+          onFile={(e) => loadFile("a", e.target.files[0])}
+          onPlayPause={() => togglePlay("a")}
+          onGain={(v) => setDeckGain("a", v)}
+          onEq={(band, v) => setDeckEq("a", band, v)}
+        />
+
+        <section className="mixer">
+          <p className="eyebrow">Mixer</p>
+          <h2>Master Control</h2>
+
+          <label className="crossfader">
+            Crossfade
+            <input type="range" min="0" max="1" step="0.01" defaultValue="0.5" onChange={(e) => crossfade(e.target.value)} />
+            <div className="ab"><span>A</span><span>B</span></div>
+          </label>
+
+          <button className={micOn ? "mic active" : "mic"} onClick={toggleMic}>
+            <Mic2 size={18} />
+            {micOn ? "External Input On" : "External Input"}
+          </button>
+
+          <button className={broadcasting ? "broadcastButton stop" : "broadcastButton"} onClick={fakeBroadcast}>
+            <Headphones size={18} />
+            {broadcasting ? "Stop Broadcast" : "Go Live"}
+          </button>
+
+          <div className="status">
+            <span>Status</span>
+            <strong>{status}</strong>
+          </div>
+
+          <div className="note">
+            The master mix is already routed to a MediaStreamDestination in the browser. The next production step is sending that stream to a WebRTC ingest server, then encoding to Icecast/LibreTime.
+          </div>
+        </section>
+
+        <Deck
+          name="Deck B"
+          side="Source Two"
+          playing={playing.b}
+          onFile={(e) => loadFile("b", e.target.files[0])}
+          onPlayPause={() => togglePlay("b")}
+          onGain={(v) => setDeckGain("b", v)}
+          onEq={(band, v) => setDeckEq("b", band, v)}
+        />
+      </div>
+    </main>
+  );
+}
+
+createRoot(document.getElementById("root")).render(<App />);
