@@ -2,60 +2,10 @@
 import React, { useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
-  Radio,
-  Play,
-  Pause,
-  Upload,
-  Mic2,
-  Headphones,
-  CalendarDays,
-  ArrowRight,
-  Signal,
-  Lock,
-  Library,
-  Users,
+  Radio, Play, Pause, Upload, Mic2, Headphones, CalendarDays,
+  ArrowRight, Signal, Lock, Library
 } from "lucide-react";
 import "./styles.css";
-
-const shows = [
-  {
-    time: "12:00",
-    title: "Morning Frequencies",
-    host: "Maya N.",
-    city: "New York",
-    tags: ["ambient", "jazz", "field recordings"],
-  },
-  {
-    time: "14:00",
-    title: "Low-End Theory Office Hours",
-    host: "Jules",
-    city: "London",
-    tags: ["club", "rap", "bass"],
-  },
-  {
-    time: "16:00",
-    title: "After School Special",
-    host: "No Signal Team",
-    city: "Los Angeles",
-    tags: ["leftfield pop", "r&b"],
-  },
-  {
-    time: "18:00",
-    title: "Guest Transmission",
-    host: "Open Decks",
-    city: "Remote",
-    tags: ["guest mix", "live"],
-  },
-];
-
-const archives = [
-  ["Steel Tones", "Detroit", "techno / electro"],
-  ["Soft Static", "Brooklyn", "ambient / spoken word"],
-  ["Palm Wine Computer", "Lagos", "highlife / digital"],
-  ["Night Bus Home", "London", "garage / dub"],
-  ["Weather Report", "Tokyo", "city pop / jazz"],
-  ["Basement Service", "Atlanta", "rap / soul"],
-];
 
 function makeDeck(audioContext, sourceNode) {
   const gain = audioContext.createGain();
@@ -93,14 +43,14 @@ function StationLanding({ setView }) {
     <main className="stationPage">
       <nav className="nav">
         <button className="wordmark" onClick={() => setView("station")}>
-          SIGNAL ROOM
+          123 RADIO
         </button>
         <div className="navLinks">
           <a>Live</a>
           <a>Schedule</a>
           <a>Archive</a>
           <button onClick={() => setView("booth")} className="navButton">
-            Broadcast
+            DJ Login
           </button>
         </div>
       </nav>
@@ -108,20 +58,20 @@ function StationLanding({ setView }) {
       <section className="hero">
         <div className="heroCopy">
           <div className="liveTag">
-            <span></span> Live Now
+            <span></span> Live Soon
           </div>
           <h1>Independent radio, broadcasting from wherever the room is.</h1>
           <p>
-            A 24/7 station homepage for listeners, residents, and remote DJs. Built around live programming,
-            guest transmissions, and an archive that feels like a record shop wall.
+            A remote-first radio station for listeners, residents, and guest DJs. Live programming,
+            archives, and show information coming soon.
           </p>
           <div className="heroActions">
             <button className="primary" onClick={() => setPlaying(!playing)}>
               {playing ? <Pause size={18} /> : <Play size={18} />}
-              {playing ? "Pause Live" : "Play Live"}
+              {playing ? "Pause Preview" : "Play Preview"}
             </button>
             <button className="secondary" onClick={() => setView("booth")}>
-              Open Creator Booth <ArrowRight size={18} />
+              DJ Login <ArrowRight size={18} />
             </button>
           </div>
         </div>
@@ -132,8 +82,8 @@ function StationLanding({ setView }) {
           </div>
           <div className="cardMeta">
             <p>Channel 1</p>
-            <h2>Morning Frequencies</h2>
-            <span>Maya N. · New York · ambient / jazz / field recordings</span>
+            <h2>Programming TBA</h2>
+            <span>Live schedule coming soon</span>
           </div>
         </div>
       </section>
@@ -151,7 +101,7 @@ function StationLanding({ setView }) {
         </div>
         <div className="channel">
           <p>Fallback</p>
-          <h3>LibreTime Automation</h3>
+          <h3>Station Automation</h3>
           <span>Scheduled playout when nobody is live</span>
         </div>
       </section>
@@ -162,29 +112,21 @@ function StationLanding({ setView }) {
             <CalendarDays size={21} />
             <h2>Coming Up</h2>
           </div>
-          <div className="schedule">
-            {shows.map((show) => (
-              <div className="scheduleRow" key={show.title}>
-                <strong>{show.time}</strong>
-                <div>
-                  <h3>{show.title}</h3>
-                  <p>{show.host} · {show.city}</p>
-                </div>
-                <span>{show.tags.join(" / ")}</span>
-              </div>
-            ))}
+          <div className="schedule emptyState">
+            <h3>Schedule Coming Soon</h3>
+            <p>Programming will appear here once shows are announced.</p>
           </div>
         </div>
 
         <aside className="creatorPanel">
           <Lock size={22} />
-          <h2>Broadcast From Anywhere</h2>
+          <h2>DJ Login</h2>
           <p>
-            Send DJs a private creator link. They can load files, use an external audio interface,
-            mix two decks, and push the final feed into your station ingest.
+            Private creator access for remote broadcasting. DJs can load files, use an external audio interface,
+            mix two decks, and eventually push the final feed into the station ingest.
           </p>
           <button className="primary full" onClick={() => setView("booth")}>
-            Enter Booth
+            DJ Login
           </button>
         </aside>
       </section>
@@ -192,24 +134,22 @@ function StationLanding({ setView }) {
       <section>
         <div className="sectionTitle">
           <Library size={21} />
-          <h2>Recent Broadcasts</h2>
+          <h2>Archive</h2>
         </div>
-        <div className="archiveGrid">
-          {archives.map(([title, city, tags], i) => (
-            <article className="archiveCard" key={title}>
-              <div className="miniArt">{String(i + 1).padStart(2, "0")}</div>
-              <h3>{title}</h3>
-              <p>{city}</p>
-              <span>{tags}</span>
-            </article>
-          ))}
+        <div className="archiveGrid blankArchive">
+          <article className="archiveCard emptyArchiveCard">
+            <div className="miniArt">—</div>
+            <h3>Archives Coming Soon</h3>
+            <p>Past broadcasts will live here.</p>
+            <span>Shows TBA</span>
+          </article>
         </div>
       </section>
 
       <footer className="footer">
         <div>
-          <h2>SIGNAL ROOM</h2>
-          <p>Public site + remote creator booth prototype.</p>
+          <h2>123 RADIO</h2>
+          <p>Public site + remote DJ booth prototype.</p>
         </div>
         <button className="secondary" onClick={() => setView("booth")}>
           DJ Login
@@ -240,20 +180,16 @@ function Deck({ name, side, onFile, onPlayPause, playing, onGain, onEq }) {
       </button>
 
       <div className="controls">
-        <label>
-          Volume
+        <label>Volume
           <input type="range" min="0" max="1" step="0.01" defaultValue="0.8" onChange={(e) => onGain(+e.target.value)} />
         </label>
-        <label>
-          Lows
+        <label>Lows
           <input type="range" min="-24" max="24" step="1" defaultValue="0" onChange={(e) => onEq("low", +e.target.value)} />
         </label>
-        <label>
-          Mids
+        <label>Mids
           <input type="range" min="-24" max="24" step="1" defaultValue="0" onChange={(e) => onEq("mid", +e.target.value)} />
         </label>
-        <label>
-          Highs
+        <label>Highs
           <input type="range" min="-24" max="24" step="1" defaultValue="0" onChange={(e) => onEq("high", +e.target.value)} />
         </label>
       </div>
@@ -278,11 +214,9 @@ function CreatorBooth({ setView }) {
       const ctx = new AudioContext();
       const master = ctx.createGain();
       const destination = ctx.createMediaStreamDestination();
-
       master.gain.value = 0.9;
       master.connect(ctx.destination);
       master.connect(destination);
-
       ctxRef.current = ctx;
       masterRef.current = master;
       destRef.current = destination;
@@ -381,11 +315,11 @@ function CreatorBooth({ setView }) {
   return (
     <main className="boothPage">
       <header className="topbar">
-        <button className="backButton" onClick={() => setView("station")}>← Station Site</button>
+        <button className="backButton" onClick={() => setView("station")}>← 123 Radio</button>
         <div className="brand">
           <Radio />
           <div>
-            <h1>Creator Booth</h1>
+            <h1>DJ Booth</h1>
             <p>Remote broadcast console</p>
           </div>
         </div>
@@ -393,10 +327,7 @@ function CreatorBooth({ setView }) {
       </header>
 
       <div className="grid">
-        <Deck
-          name="Deck A"
-          side="Source One"
-          playing={playing.a}
+        <Deck name="Deck A" side="Source One" playing={playing.a}
           onFile={(e) => loadFile("a", e.target.files[0])}
           onPlayPause={() => togglePlay("a")}
           onGain={(v) => setDeckGain("a", v)}
@@ -429,14 +360,11 @@ function CreatorBooth({ setView }) {
           </div>
 
           <div className="note">
-            The master mix is already routed to a MediaStreamDestination in the browser. The next production step is sending that stream to a WebRTC ingest server, then encoding to Icecast/LibreTime.
+            The master mix is routed to a browser MediaStreamDestination. The next production step is sending this stream to a WebRTC ingest server, then encoding to Icecast or LibreTime.
           </div>
         </section>
 
-        <Deck
-          name="Deck B"
-          side="Source Two"
-          playing={playing.b}
+        <Deck name="Deck B" side="Source Two" playing={playing.b}
           onFile={(e) => loadFile("b", e.target.files[0])}
           onPlayPause={() => togglePlay("b")}
           onGain={(v) => setDeckGain("b", v)}

@@ -14,13 +14,8 @@ body {
     linear-gradient(135deg, #07090d, #121722);
 }
 
-button, input {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
+button, input { font: inherit; }
+button { cursor: pointer; }
 
 .stationPage, .boothPage {
   min-height: 100vh;
@@ -90,9 +85,7 @@ button {
   box-shadow: 0 24px 80px rgba(0,0,0,.3);
 }
 
-.heroCopy {
-  padding: clamp(28px, 5vw, 64px);
-}
+.heroCopy { padding: clamp(28px, 5vw, 64px); }
 
 .liveTag {
   display: inline-flex;
@@ -151,9 +144,7 @@ button {
     repeating-linear-gradient(45deg, rgba(255,255,255,.1) 0 1px, transparent 1px 16px);
 }
 
-.cardMeta {
-  padding: 22px;
-}
+.cardMeta { padding: 22px; }
 
 .cardMeta p, .eyebrow, .channel p {
   margin: 0 0 6px;
@@ -164,13 +155,8 @@ button {
   font-weight: 900;
 }
 
-.cardMeta h2, .channel h3, .creatorPanel h2, .archiveCard h3 {
-  margin: 0 0 8px;
-}
-
-.cardMeta span, .channel span, .archiveCard span {
-  color: #aab7c5;
-}
+.cardMeta h2, .channel h3, .creatorPanel h2, .archiveCard h3 { margin: 0 0 8px; }
+.cardMeta span, .channel span, .archiveCard span { color: #aab7c5; }
 
 .channelGrid {
   display: grid;
@@ -179,13 +165,8 @@ button {
   margin-bottom: 34px;
 }
 
-.channel {
-  padding: 22px;
-}
-
-.channel.active {
-  outline: 2px solid rgba(248,250,252,.42);
-}
+.channel { padding: 22px; }
+.channel.active { outline: 2px solid rgba(248,250,252,.42); }
 
 .split {
   display: grid;
@@ -213,27 +194,17 @@ button {
   overflow: hidden;
 }
 
-.scheduleRow {
+.emptyState {
+  min-height: 220px;
   display: grid;
-  grid-template-columns: 76px 1fr 210px;
-  gap: 16px;
-  align-items: center;
-  padding: 18px;
+  place-content: center;
+  text-align: center;
+  padding: 28px;
   background: rgba(255,255,255,.045);
-  border-bottom: 1px solid rgba(255,255,255,.1);
 }
 
-.scheduleRow:last-child {
-  border-bottom: 0;
-}
-
-.scheduleRow h3, .scheduleRow p {
-  margin: 0;
-}
-
-.scheduleRow p, .scheduleRow span {
-  color: #aab7c5;
-}
+.emptyState h3, .emptyState p { margin: 0; }
+.emptyState p { margin-top: 8px; color: #aab7c5; }
 
 .creatorPanel {
   padding: 24px;
@@ -245,19 +216,17 @@ button {
   line-height: 1.5;
 }
 
-.full {
-  width: 100%;
-  justify-content: center;
-}
+.full { width: 100%; justify-content: center; }
 
 .archiveGrid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: 1fr;
   gap: 14px;
 }
 
 .archiveCard {
   padding: 14px;
+  max-width: 420px;
 }
 
 .miniArt {
@@ -284,13 +253,8 @@ button {
   align-items: center;
 }
 
-.footer h2, .footer p {
-  margin: 0;
-}
-
-.footer p {
-  color: #aab7c5;
-}
+.footer h2, .footer p { margin: 0; }
+.footer p { color: #aab7c5; }
 
 .topbar {
   display: grid;
@@ -313,10 +277,7 @@ button {
   margin: 0;
 }
 
-.brand p {
-  color: #93a4b8;
-  margin: 0;
-}
+.brand p { color: #93a4b8; margin: 0; }
 
 .livePill {
   justify-self: end;
@@ -329,10 +290,7 @@ button {
   font-weight: 900;
 }
 
-.livePill.onAir {
-  background: #ef4444;
-  color: #fff;
-}
+.livePill.onAir { background: #ef4444; color: #fff; }
 
 .grid {
   display: grid;
@@ -417,9 +375,7 @@ input[type="range"] {
   gap: 22px;
 }
 
-.crossfader {
-  margin-top: 14px;
-}
+.crossfader { margin-top: 14px; }
 
 .ab {
   display: flex;
@@ -433,20 +389,14 @@ input[type="range"] {
   border: 1px solid rgba(255,255,255,.12);
 }
 
-.mic.active {
-  background: #bbf7d0;
-  color: #052e16;
-}
+.mic.active { background: #bbf7d0; color: #052e16; }
 
 .broadcastButton {
   background: #60a5fa;
   color: #06111f;
 }
 
-.broadcastButton.stop {
-  background: #ef4444;
-  color: #fff;
-}
+.broadcastButton.stop { background: #ef4444; color: #fff; }
 
 .status, .note {
   background: rgba(0,0,0,.22);
@@ -473,59 +423,25 @@ input[type="range"] {
 }
 
 @media (max-width: 1180px) {
-  .archiveGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .hero, .split {
-    grid-template-columns: 1fr;
-  }
+  .hero, .split { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 1050px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-
-  .mixer {
-    order: -1;
-  }
-
-  .topbar {
-    grid-template-columns: 1fr;
-  }
-
-  .brand, .livePill {
-    justify-self: start;
-  }
+  .grid { grid-template-columns: 1fr; }
+  .mixer { order: -1; }
+  .topbar { grid-template-columns: 1fr; }
+  .brand, .livePill { justify-self: start; }
 }
 
 @media (max-width: 760px) {
-  .stationPage, .boothPage {
-    padding: 14px;
-  }
-
+  .stationPage, .boothPage { padding: 14px; }
   .nav, .navLinks, .footer {
     align-items: flex-start;
     flex-direction: column;
   }
-
-  .hero h1 {
-    font-size: 54px;
-  }
-
-  .channelGrid, .archiveGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .scheduleRow {
-    grid-template-columns: 1fr;
-  }
-
-  .deckHeader {
-    flex-direction: column;
-  }
-
+  .hero h1 { font-size: 54px; }
+  .channelGrid { grid-template-columns: 1fr; }
+  .deckHeader { flex-direction: column; }
   .upload {
     width: 100%;
     justify-content: center;
