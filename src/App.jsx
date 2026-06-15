@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 import "./styles.css";
 
-const FFMPEG_URL = "icecast://source:tFtTYFdC@127.0.0.1:8000/";
 
 function makeDeck(audioContext, sourceNode) {
   const gain = audioContext.createGain();
@@ -216,7 +215,7 @@ function CreatorBooth({ setView }) {
   const destRef = useRef(null);
   const micRef = useRef(null);
   const socketRef = useRef(null);
-const recorderRef = useRef(null);
+  const recorderRef = useRef(null);
   const [playing, setPlaying] = useState({ a: false, b: false });
   const [micOn, setMicOn] = useState(false);
   const [broadcasting, setBroadcasting] = useState(false);
@@ -321,26 +320,24 @@ const recorderRef = useRef(null);
   }
 
   async function fakeBroadcast() {
-    const ctx = ensureAudio();
-  
+    ensureAudio();
+
     if (!broadcasting) {
       try {
-        const socket = new WebSocket("ws://127.0.0.1:8080");
+        const socket = new WebSocket("ws://137.184.158.254:8080");
 
         socketRef.current = socket;
 
         socket.onopen = () => {
-          socket.send(JSON.stringify({ ffmpegUrl: FFMPEG_URL }));
-
           const recorder = new MediaRecorder(
             destRef.current.stream,
             {
               mimeType: "audio/webm"
             }
           );
-  
+
           recorderRef.current = recorder;
-  
+
           recorder.ondataavailable = (e) => {
             if (
               e.data.size > 0 &&
@@ -349,15 +346,20 @@ const recorderRef = useRef(null);
               socket.send(e.data);
             }
           };
-  
+
           recorder.start(250);
-  
+
           setBroadcasting(true);
           setStatus("Connected to 123 Radio ingest");
         };
-  
-        socket.onerror = () => {
+
+        socket.onerror = (err) => {
+          console.error(err);
           setStatus("WebSocket connection failed");
+        };
+
+        socket.onclose = () => {
+          setStatus("Socket disconnected");
         };
       } catch (err) {
         console.error(err);
@@ -366,11 +368,12 @@ const recorderRef = useRef(null);
     } else {
       recorderRef.current?.stop();
       socketRef.current?.close();
-  
+
       setBroadcasting(false);
       setStatus("Broadcast stopped");
     }
   }
+
   return (
     <main className="boothPage">
       <header className="topbar">
