@@ -75,7 +75,7 @@ function StationLanding({ setView }) {
               }}
             >
               <source
-                src="http://137.184.158.254/listen/123_radio/radio.mp3"
+                src="https://radio.123radio.org/radio.mp3"
                 type="audio/mpeg"
               />
             </audio>
