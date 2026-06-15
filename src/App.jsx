@@ -324,11 +324,7 @@ function CreatorBooth({ setView }) {
 
     if (!broadcasting) {
       try {
-<<<<<<< HEAD
         const socket = new WebSocket("wss://broadcast.123radio.org");
-=======
-        const socket = new WebSocket("ws://137.184.158.254:8080");
->>>>>>> parent of 45fad71 (Point broadcast WebSocket ingest at broadcast.123radio.org.)
 
         socketRef.current = socket;
 
