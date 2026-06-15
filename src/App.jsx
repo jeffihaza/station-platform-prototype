@@ -55,9 +55,9 @@ function StationLanding({ setView }) {
   return (
     <main className="stationPage">
       <nav className="nav">
-        <button className="wordmark" onClick={() => setView("station")}>
-          123 RADIO
-        </button>
+      <button onClick={() => window.location.href = "/"}>
+  ← 123 Radio
+</button>
         <div className="navLinks">
           <a>Live</a>
           <a>Schedule</a>
@@ -96,10 +96,12 @@ function StationLanding({ setView }) {
                 type="audio/mpeg"
               />
             </audio>
-
-            <button className="secondary" onClick={() => setView("booth")}>
-              DJ Login
-            </button>
+            <button
+  className="secondary"
+  onClick={() => window.location.href = "/dj"}
+>
+  DJ Login
+</button>
           </div>
         </div>
 
@@ -152,9 +154,12 @@ function StationLanding({ setView }) {
             Private creator access for remote broadcasting. DJs can load files, use an external audio interface,
             mix two decks, and eventually push the final feed into the station ingest.
           </p>
-          <button className="primary full" onClick={() => setView("booth")}>
-            DJ Login
-          </button>
+          <button
+  className="secondary"
+  onClick={() => window.location.href = "/dj"}
+>
+  DJ Login
+</button>
         </aside>
       </section>
 
@@ -178,9 +183,12 @@ function StationLanding({ setView }) {
           <h2>123 RADIO</h2>
           <p>Public site + remote DJ booth prototype.</p>
         </div>
-        <button className="secondary" onClick={() => setView("booth")}>
-          DJ Login
-        </button>
+        <button
+  className="secondary"
+  onClick={() => window.location.href = "/dj"}
+>
+  DJ Login
+</button>
       </footer>
     </main>
   );
@@ -394,7 +402,8 @@ function CreatorBooth({ setView }) {
   return (
     <main className="boothPage">
       <header className="topbar">
-        <button className="backButton" onClick={() => setView("station")}>← 123 Radio</button>
+      <button onClick={() => window.location.href = "/"}>
+  ← Back to123 Radio </button>
         <div className="brand">
           <Radio />
           <div>
