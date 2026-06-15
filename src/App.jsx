@@ -157,7 +157,7 @@ const [currentTrack, setCurrentTrack] = useState("OFFLINE");
   
   
   );
-  }
+  
   
 
 function Deck({ name, side, onFile, onPlayPause, playing, onGain, onEq }) {
