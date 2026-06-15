@@ -55,30 +55,26 @@ function StationLanding() {
   const [currentTrack, setCurrentTrack] = useState("OFFLINE");
 
   useEffect(() => {
-    const loadNowPlaying = async () => {
+    const loadStatus = async () => {
       try {
         const res = await fetch(
-          "https://137.184.158.254/api/nowplaying/1"
+          "http://137.184.158.254:8091/status"
         );
-
+  
         const data = await res.json();
-
-        const title = data?.now_playing?.song?.title;
-
+  
         setCurrentTrack(
-          title && title !== "Station Offline"
-            ? title
-            : "OFFLINE"
+          data.live ? "ON AIR" : "OFFLINE"
         );
       } catch {
         setCurrentTrack("OFFLINE");
       }
     };
-
-    loadNowPlaying();
-
-    const interval = setInterval(loadNowPlaying, 10000);
-
+  
+    loadStatus();
+  
+    const interval = setInterval(loadStatus, 5000);
+  
     return () => clearInterval(interval);
   }, []);
 
