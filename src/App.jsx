@@ -7,6 +7,8 @@ import {
 } from "lucide-react";
 import "./styles.css";
 
+const FFMPEG_URL = "icecast://source:tFtTYFdC@127.0.0.1:8000/";
+
 function makeDeck(audioContext, sourceNode) {
   const gain = audioContext.createGain();
   const low = audioContext.createBiquadFilter();
@@ -323,13 +325,13 @@ const recorderRef = useRef(null);
   
     if (!broadcasting) {
       try {
-        const socket = new WebSocket(
-          "ws://137.184.158.254:8080"
-        );
-  
+        const socket = new WebSocket("ws://127.0.0.1:8080");
+
         socketRef.current = socket;
-  
+
         socket.onopen = () => {
+          socket.send(JSON.stringify({ ffmpegUrl: FFMPEG_URL }));
+
           const recorder = new MediaRecorder(
             destRef.current.stream,
             {
