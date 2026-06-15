@@ -65,35 +65,32 @@ function StationLanding() {
       </button>
     </header>
   
-    <section className="liveSection">
-  
-      <div className="liveLabel">
-        LIVE NOW
-      </div>
-  
-      <h1 className="liveHost">
-        Christine
-      </h1>
-  
-      <p className="liveLocation">
-        Broadcasting from Ridgewood
-      </p>
-  
-      <p className="liveMeta">
-        Started 1:07 PM · 12 listeners
-      </p>
-  
-      <audio
-        controls
-        preload="none"
-      >
-        <source
-          src="https://radio.123radio.org/radio.mp3"
-          type="audio/mpeg"
-        />
-      </audio>
-  
-    </section>
+  <section className="liveSection">
+
+  <div className="liveLabel">
+    LIVE NOW
+  </div>
+
+  <h1 className="liveDate">
+    {new Date().toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric"
+    }).toUpperCase()}
+  </h1>
+
+  <p className="liveTrack">
+    {currentTrack || "OFFLINE"}
+  </p>
+
+  <audio controls preload="none">
+    <source
+      src="https://radio.123radio.org/radio.mp3"
+      type="audio/mpeg"
+    />
+  </audio>
+
+</section>
   
     <section className="divider">
       ────────────────────────

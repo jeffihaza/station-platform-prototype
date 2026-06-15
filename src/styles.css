@@ -288,3 +288,21 @@ h2 {
     grid-template-columns: 1fr;
   }
 }
+
+.liveDate {
+  font-size: clamp(64px, 12vw, 140px);
+  line-height: 0.9;
+  margin: 0 0 24px;
+  font-weight: 600;
+}
+
+.liveTrack {
+  font-size: 24px;
+  opacity: 0.8;
+  margin-bottom: 40px;
+}
+
+.liveLabel {
+  margin-bottom: 32px;
+  letter-spacing: 0.08em;
+}
