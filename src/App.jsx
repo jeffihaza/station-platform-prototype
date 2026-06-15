@@ -54,7 +54,6 @@ function App() {
 function StationLanding() {
   return ( <main className="stationMinimal">
   
-
     <header className="minimalHeader">
       <div>123 RADIO</div>
   
@@ -128,7 +127,7 @@ function StationLanding() {
     </section>
   
   </main>
-
+  
   
   );
   }
