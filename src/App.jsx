@@ -80,8 +80,8 @@ function StationLanding() {
   </h1>
 
   <p className="liveTrack">
-    {currentTrack || "OFFLINE"}
-  </p>
+  OFFLINE
+</p>
 
   <audio controls preload="none">
     <source
