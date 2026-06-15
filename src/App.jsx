@@ -51,7 +51,7 @@ function App() {
   );
 }
 
-function StationLanding() 
+function StationLanding() {
 const [currentTrack, setCurrentTrack] = useState("OFFLINE");
 {
   useEffect(() => {
@@ -81,6 +81,7 @@ const [currentTrack, setCurrentTrack] = useState("OFFLINE");
   
     return () => clearInterval(interval);
   }, []);}
+}
   
   return ( <main className="stationMinimal">
   
