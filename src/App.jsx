@@ -7,6 +7,14 @@ import {
 } from "lucide-react";
 import "./styles.css";
 
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link
+} from "react-router-dom";
+
+
 
 function makeDeck(audioContext, sourceNode) {
   const gain = audioContext.createGain();
@@ -33,8 +41,14 @@ function makeDeck(audioContext, sourceNode) {
 }
 
 function App() {
-  const [view, setView] = useState("station");
-  return view === "station" ? <StationLanding setView={setView} /> : <CreatorBooth setView={setView} />;
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<StationLanding />} />
+        <Route path="/dj" element={<CreatorBooth />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 function StationLanding({ setView }) {
@@ -48,9 +62,12 @@ function StationLanding({ setView }) {
           <a>Live</a>
           <a>Schedule</a>
           <a>Archive</a>
-          <button onClick={() => setView("booth")} className="navButton">
-            DJ Login
-          </button>
+          <button
+  className="navButton"
+  onClick={() => window.location.href="/dj"}
+>
+  DJ Login
+</button>
         </div>
       </nav>
 
