@@ -340,22 +340,18 @@ function CreatorBooth({ setView }) {
 
   return (
     <main className="boothPage">
-      <header className="boothHeader">
-  <button
-    className="minimalLink"
-    onClick={() => window.location.href="/"}
-  >
-    ← RETURN TO STATION
-  </button>
-
-  <div className="boothTitle">
-    DJ BOOTH
-  </div>
-
-  <div className={`statusLight ${broadcasting ? "live" : "offline"}`}>
-    {broadcasting ? "● LIVE" : "○ OFFLINE"}
-  </div>
-</header>
+      <header className="topbar">
+      <button onClick={() => window.location.href = "/"}>
+  ← Back to123 Radio </button>
+        <div className="brand">
+          <Radio />
+          <div>
+            <h1>DJ Booth</h1>
+            <p>Remote broadcast console</p>
+          </div>
+        </div>
+        <div className={broadcasting ? "livePill onAir" : "livePill"}>{broadcasting ? "ON AIR SIM" : "LOCAL PREVIEW"}</div>
+      </header>
 
       <div className="grid">
         <Deck name="Deck A" side="Source One" playing={playing.a}
