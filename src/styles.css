@@ -219,3 +219,72 @@ h2 {
   gap: 12px;
   margin-top: 20px;
 }
+/* =========================
+   DJ BOOTH
+========================= */
+
+.boothPage {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.boothHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.boothHeader h1 {
+  margin: 0;
+}
+
+.statusLight.live {
+  color: #00ff66;
+}
+
+.statusLight.offline {
+  color: #777;
+}
+
+.deckGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.deck {
+  border: 1px solid #222;
+  padding: 24px;
+}
+
+.masterPanel {
+  border: 1px solid #222;
+  padding: 24px;
+}
+
+.masterActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.statusLine {
+  margin-top: 16px;
+  opacity: 0.75;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .deckGrid {
+    grid-template-columns: 1fr;
+  }
+}

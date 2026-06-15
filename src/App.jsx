@@ -336,67 +336,89 @@ function CreatorBooth({ setView }) {
 
   return (
     <main className="boothPage">
-      <header className="boothHeader">
-  <button
-    className="minimalLink"
-    onClick={() => window.location.href="/"}
-  >
-    ← RETURN TO STATION
-  </button>
 
-  <div className="boothTitle">
-    DJ BOOTH
+  <header className="boothHeader">
+    <button
+      className="backButton"
+      onClick={() => window.location.href="/"}
+    >
+      ← RETURN TO STATION
+    </button>
+
+    <h1>DJ BOOTH</h1>
+
+    <div className={`statusLight ${broadcasting ? "live" : "offline"}`}>
+      {broadcasting ? "● LIVE" : "○ OFFLINE"}
+    </div>
+  </header>
+
+  <div className="deckGrid">
+
+    <Deck
+      name="DECK A"
+      playing={playing.a}
+      onFile={(e) => loadFile("a", e.target.files[0])}
+      onPlayPause={() => togglePlay("a")}
+      onGain={(v) => setDeckGain("a", v)}
+      onEq={(band, v) => setDeckEq("a", band, v)}
+    />
+
+    <Deck
+      name="DECK B"
+      playing={playing.b}
+      onFile={(e) => loadFile("b", e.target.files[0])}
+      onPlayPause={() => togglePlay("b")}
+      onGain={(v) => setDeckGain("b", v)}
+      onEq={(band, v) => setDeckEq("b", band, v)}
+    />
+
   </div>
 
-  <div className={`statusLight ${broadcasting ? "live" : "offline"}`}>
-    {broadcasting ? "● LIVE" : "○ OFFLINE"}
-  </div>
-</header>
+  <section className="masterPanel">
 
-      <div className="grid">
-        <Deck name="Deck A"  playing={playing.a}
-          onFile={(e) => loadFile("a", e.target.files[0])}
-          onPlayPause={() => togglePlay("a")}
-          onGain={(v) => setDeckGain("a", v)}
-          onEq={(band, v) => setDeckEq("a", band, v)}
-        />
+    <h2>MASTER</h2>
 
-        <section className="mixer">
-          <h2>Master</h2>
+    <label className="crossfade">
+      Crossfade
 
-          <label className="crossfader">
-            Crossfade
-            <input type="range" min="0" max="1" step="0.01" defaultValue="0.5" onChange={(e) => crossfade(e.target.value)} />
-            <div className="ab"><span>A</span><span>B</span></div>
-          </label>
-          <div className="masterActions">
-          <button className={micOn ? "mic active" : "mic"} onClick={toggleMic}>
-            <Mic2 size={18} />
-            {micOn ? "External Input On" : "External Input"}
-          </button>
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        defaultValue="0.5"
+      />
+    </label>
 
-          <button className={broadcasting ? "broadcastButton stop" : "broadcastButton"} onClick={fakeBroadcast}>
-            <Headphones size={18} />
-            {broadcasting ? "Stop Broadcast" : "Go Live"}
-          </button>
+    <div className="masterActions">
 
-          <div className="status">
-            <span>Status</span>
-            <strong>{status}</strong>
-          </div>
-          </div>
+      <button
+        className={micOn ? "mic active" : "mic"}
+        onClick={toggleMic}
+      >
+        {micOn ? "EXTERNAL INPUT ON" : "EXTERNAL INPUT"}
+      </button>
 
-         
-        </section>
+      <button
+        className={
+          broadcasting
+            ? "broadcastButton stop"
+            : "broadcastButton"
+        }
+        onClick={fakeBroadcast}
+      >
+        {broadcasting ? "STOP BROADCAST" : "GO LIVE"}
+      </button>
 
-        <Deck name="Deck B" playing={playing.b}
-          onFile={(e) => loadFile("b", e.target.files[0])}
-          onPlayPause={() => togglePlay("b")}
-          onGain={(v) => setDeckGain("b", v)}
-          onEq={(band, v) => setDeckEq("b", band, v)}
-        />
-      </div>
-    </main>
+    </div>
+
+    <div className="statusLine">
+      {status}
+    </div>
+
+  </section>
+
+</main>
   );
 }
 
