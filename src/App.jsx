@@ -137,10 +137,6 @@ function Deck({ name, side, onFile, onPlayPause, playing, onGain, onEq }) {
   return (
     <section className="deck">
       <div className="deckHeader">
-        <div>
-          <p className="eyebrow">{side}</p>
-          <h2>{name}</h2>
-        </div>
         <label className="upload">
           <Upload size={17} />
           Load Track
@@ -358,7 +354,7 @@ function CreatorBooth({ setView }) {
 </header>
 
       <div className="grid">
-        <Deck name="Deck A" side="Source One" playing={playing.a}
+        <Deck name="Deck A"  playing={playing.a}
           onFile={(e) => loadFile("a", e.target.files[0])}
           onPlayPause={() => togglePlay("a")}
           onGain={(v) => setDeckGain("a", v)}
@@ -366,15 +362,14 @@ function CreatorBooth({ setView }) {
         />
 
         <section className="mixer">
-          <p className="eyebrow">Mixer</p>
-          <h2>Master Control</h2>
+          <h2>Master</h2>
 
           <label className="crossfader">
             Crossfade
             <input type="range" min="0" max="1" step="0.01" defaultValue="0.5" onChange={(e) => crossfade(e.target.value)} />
             <div className="ab"><span>A</span><span>B</span></div>
           </label>
-
+          <div className="masterActions">
           <button className={micOn ? "mic active" : "mic"} onClick={toggleMic}>
             <Mic2 size={18} />
             {micOn ? "External Input On" : "External Input"}
@@ -389,13 +384,12 @@ function CreatorBooth({ setView }) {
             <span>Status</span>
             <strong>{status}</strong>
           </div>
-
-          <div className="note">
-            The master mix is routed to a browser MediaStreamDestination. The next production step is sending this stream to a WebRTC ingest server, then encoding to Icecast or LibreTime.
           </div>
+
+         
         </section>
 
-        <Deck name="Deck B" side="Source Two" playing={playing.b}
+        <Deck name="Deck B" playing={playing.b}
           onFile={(e) => loadFile("b", e.target.files[0])}
           onPlayPause={() => togglePlay("b")}
           onGain={(v) => setDeckGain("b", v)}
