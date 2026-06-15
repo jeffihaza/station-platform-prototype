@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   Radio, Play, Pause, Upload, Mic2, Headphones, CalendarDays,
@@ -10,7 +10,8 @@ import "./styles.css";
 import {
   BrowserRouter,
   Routes,
-  Route
+  Route,
+  Link
 } from "react-router-dom";
 
 
@@ -50,91 +51,113 @@ function App() {
   );
 }
 
-function StationLanding() {
-  const [currentTrack, setCurrentTrack] = useState("OFFLINE");
-
+function StationLanding() 
+const [currentTrack, setCurrentTrack] = useState("OFFLINE");
+{
   useEffect(() => {
     const loadNowPlaying = async () => {
       try {
         const res = await fetch(
           "https://137.184.158.254/api/nowplaying/1"
         );
+  
         const data = await res.json();
-
-        const title = data.now_playing?.song?.title;
-
-        setCurrentTrack(
-          title && title !== "Station Offline"
-            ? title
-            : "OFFLINE"
-        );
+  
+        if (data.live?.is_live) {
+          setCurrentTrack(
+            data.now_playing?.song?.title || "LIVE"
+          );
+        } else {
+          setCurrentTrack("OFFLINE");
+        }
+      } catch {
+        setCurrentTrack("OFFLINE");
+      }
     };
-
+  
     loadNowPlaying();
+  
     const interval = setInterval(loadNowPlaying, 10000);
+  
     return () => clearInterval(interval);
-  }, []);
+  }, []);}
+  
+  return ( <main className="stationMinimal">
+  
+    <header className="minimalHeader">
+      <div>123 RADIO</div>
+  
+      <button
+        className="minimalLink"
+        onClick={() => window.location.href="/dj"}
+      >
+        DJ LOGIN
+      </button>
+    </header>
+  
+  <section className="liveSection">
 
-  return (
-    <main className="stationMinimal">
-      <header className="minimalHeader">
-        <div>123 RADIO</div>
-        <button
-          className="minimalLink"
-          onClick={() => window.location.href="/dj"}
-        >
-          DJ LOGIN
-        </button>
-      </header>
+  <div className="liveLabel">
+  LIVE NOW
+</div>
 
-      <section className="liveSection">
-        <div className="liveLabel">LIVE NOW</div>
+<h1 className="liveDate">
+  {new Date().toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric"
+  }).toUpperCase()}
+</h1>
 
-        <h1 className="liveDate">
-          {new Date().toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric"
-          }).toUpperCase()}
-        </h1>
+<p className="liveTrack">
+  {currentTrack}
+</p>
 
-        <p className="liveTrack">{currentTrack}</p>
+  <audio controls preload="none">
+    <source
+      src="https://radio.123radio.org/radio.mp3"
+      type="audio/mpeg"
+    />
+  </audio>
 
-        <audio controls preload="none">
-          <source
-            src="https://radio.123radio.org/radio.mp3"
-            type="audio/mpeg"
-          />
-        </audio>
-      </section>
-
-      <section className="divider">
-        ────────────────────────
-      </section>
-
-      <section>
-        <h2>UPCOMING</h2>
-        <ul className="simpleList">
-          <li>7 PM — Jeff</li>
-          <li>9 PM — Guest</li>
-        </ul>
-      </section>
-
-      <section className="divider">
-        ────────────────────────
-      </section>
-
-      <section>
-        <h2>RECENT BROADCASTS</h2>
-        <ul className="simpleList">
-          <li>Room 001</li>
-          <li>Room 002</li>
-          <li>Room 003</li>
-        </ul>
-      </section>
-    </main>
+</section>
+  
+    <section className="divider">
+      ────────────────────────
+    </section>
+  
+    <section>
+  
+      <h2>UPCOMING</h2>
+  
+      <ul className="simpleList">
+        <li>7 PM — Jeff</li>
+        <li>9 PM — Guest</li>
+      </ul>
+  
+    </section>
+  
+    <section className="divider">
+      ────────────────────────
+    </section>
+  
+    <section>
+  
+      <h2>RECENT BROADCASTS</h2>
+  
+      <ul className="simpleList">
+        <li>Room 001</li>
+        <li>Room 002</li>
+        <li>Room 003</li>
+      </ul>
+  
+    </section>
+  
+  </main>
+  
+  
   );
-}
+  }
   
 
 function Deck({ name, side, onFile, onPlayPause, playing, onGain, onEq }) {
