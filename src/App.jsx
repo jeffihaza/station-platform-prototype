@@ -61,16 +61,13 @@ function StationLanding() {
         );
         const data = await res.json();
 
-        if (data.live?.is_live) {
-          setCurrentTrack(
-            data.now_playing?.song?.title || "LIVE"
-          );
-        } else {
-          setCurrentTrack("OFFLINE");
-        }
-      } catch {
-        setCurrentTrack("OFFLINE");
-      }
+        const title = data.now_playing?.song?.title;
+
+        setCurrentTrack(
+          title && title !== "Station Offline"
+            ? title
+            : "OFFLINE"
+        );
     };
 
     loadNowPlaying();
