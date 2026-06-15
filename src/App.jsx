@@ -213,10 +213,13 @@ function CreatorBooth({ setView }) {
   const masterRef = useRef(null);
   const destRef = useRef(null);
   const micRef = useRef(null);
+  const socketRef = useRef(null);
+const recorderRef = useRef(null);
   const [playing, setPlaying] = useState({ a: false, b: false });
   const [micOn, setMicOn] = useState(false);
   const [broadcasting, setBroadcasting] = useState(false);
   const [status, setStatus] = useState("Offline / local preview");
+  
 
   function ensureAudio() {
     if (!ctxRef.current) {
@@ -315,12 +318,57 @@ function CreatorBooth({ setView }) {
     setStatus("External input live");
   }
 
-  function fakeBroadcast() {
-    ensureAudio();
-    setBroadcasting((b) => !b);
-    setStatus(!broadcasting ? "Broadcast simulation on — WebRTC/Icecast backend not connected yet" : "Broadcast simulation stopped");
+  async function fakeBroadcast() {
+    const ctx = ensureAudio();
+  
+    if (!broadcasting) {
+      try {
+        const socket = new WebSocket(
+          "ws://137.184.158.254:8080"
+        );
+  
+        socketRef.current = socket;
+  
+        socket.onopen = () => {
+          const recorder = new MediaRecorder(
+            destRef.current.stream,
+            {
+              mimeType: "audio/webm"
+            }
+          );
+  
+          recorderRef.current = recorder;
+  
+          recorder.ondataavailable = (e) => {
+            if (
+              e.data.size > 0 &&
+              socket.readyState === WebSocket.OPEN
+            ) {
+              socket.send(e.data);
+            }
+          };
+  
+          recorder.start(250);
+  
+          setBroadcasting(true);
+          setStatus("Connected to 123 Radio ingest");
+        };
+  
+        socket.onerror = () => {
+          setStatus("WebSocket connection failed");
+        };
+      } catch (err) {
+        console.error(err);
+        setStatus("Connection error");
+      }
+    } else {
+      recorderRef.current?.stop();
+      socketRef.current?.close();
+  
+      setBroadcasting(false);
+      setStatus("Broadcast stopped");
+    }
   }
-
   return (
     <main className="boothPage">
       <header className="topbar">
