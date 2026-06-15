@@ -52,39 +52,39 @@ function App() {
 }
 
 function StationLanding() {
-const [currentTrack, setCurrentTrack] = useState("OFFLINE");
-{
+  const [currentTrack, setCurrentTrack] = useState("OFFLINE");
+
   useEffect(() => {
     const loadNowPlaying = async () => {
       try {
         const res = await fetch(
           "https://137.184.158.254/api/nowplaying/1"
         );
-  
+
         const data = await res.json();
-  
-        if (data.live?.is_live) {
-          setCurrentTrack(
-            data.now_playing?.song?.title || "LIVE"
-          );
-        } else {
-          setCurrentTrack("OFFLINE");
-        }
+
+        const title = data?.now_playing?.song?.title;
+
+        setCurrentTrack(
+          title && title !== "Station Offline"
+            ? title
+            : "OFFLINE"
+        );
       } catch {
         setCurrentTrack("OFFLINE");
       }
     };
-  
+
     loadNowPlaying();
-  
+
     const interval = setInterval(loadNowPlaying, 10000);
-  
+
     return () => clearInterval(interval);
-  }, []);}
-}
-  
-  return ( <main className="stationMinimal">
-  
+  }, []);
+
+  return (
+    <main className="stationMinimal">
+    
     <header className="minimalHeader">
       <div>123 RADIO</div>
   
@@ -154,10 +154,10 @@ const [currentTrack, setCurrentTrack] = useState("OFFLINE");
   
     </section>
   
-  </main>
-  
-  
+   
+   </main>
   );
+}
   
   
 
