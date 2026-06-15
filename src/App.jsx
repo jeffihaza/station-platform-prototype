@@ -324,7 +324,7 @@ function CreatorBooth({ setView }) {
 
     if (!broadcasting) {
       try {
-        const socket = new WebSocket("ws://broadcast.123radio.org:8080");
+        const socket = new WebSocket("wss://broadcast.123radio.org");
 
         socketRef.current = socket;
 
