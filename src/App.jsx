@@ -51,87 +51,148 @@ function App() {
   );
 }
 
-function StationLanding() {
-  return ( <main className="stationMinimal">
-  
-  ```
-    <header className="minimalHeader">
-      <div>123 RADIO</div>
-  
-      <button
-        className="minimalLink"
-        onClick={() => window.location.href="/dj"}
-      >
-        DJ LOGIN
-      </button>
-    </header>
-  
-    <section className="liveSection">
-  
-      <div className="liveLabel">
-        LIVE NOW
-      </div>
-  
-      <h1 className="liveHost">
-        Christine
-      </h1>
-  
-      <p className="liveLocation">
-        Broadcasting from Ridgewood
-      </p>
-  
-      <p className="liveMeta">
-        Started 1:07 PM · 12 listeners
-      </p>
-  
-      <audio
-        controls
-        preload="none"
-      >
-        <source
-          src="https://radio.123radio.org/radio.mp3"
-          type="audio/mpeg"
-        />
-      </audio>
-  
-    </section>
-  
-    <section className="divider">
-      ────────────────────────
-    </section>
-  
-    <section>
-  
-      <h2>UPCOMING</h2>
-  
-      <ul className="simpleList">
-        <li>7 PM — Jeff</li>
-        <li>9 PM — Guest</li>
-      </ul>
-  
-    </section>
-  
-    <section className="divider">
-      ────────────────────────
-    </section>
-  
-    <section>
-  
-      <h2>RECENT BROADCASTS</h2>
-  
-      <ul className="simpleList">
-        <li>Room 001</li>
-        <li>Room 002</li>
-        <li>Room 003</li>
-      </ul>
-  
-    </section>
-  
-  </main>
-  
+function StationLanding({ setView }) {
+  return (
+    <main className="stationPage">
+      <nav className="nav">
+      <button onClick={() => window.location.href = "/"}>
+  ← 123 Radio
+</button>
+        <div className="navLinks">
+          <a>Live</a>
+          <a>Schedule</a>
+          <a>Archive</a>
+          <button
+  className="navButton"
+  onClick={() => window.location.href="/dj"}
+>
+  DJ Login
+</button>
+        </div>
+      </nav>
+
+      <section className="hero">
+        <div className="heroCopy">
+          <div className="liveTag">
+            <span></span> Live Soon
+          </div>
+          <h1>Independent radio, broadcasting from wherever the room is.</h1>
+          <p>
+            A remote-first radio station for listeners, residents, and guest DJs. Live programming,
+            archives, and show information coming soon.
+          </p>
+          <div className="heroActions">
+            <audio
+              controls
+              preload="none"
+              style={{
+                width: "100%",
+                maxWidth: "480px",
+                marginTop: "16px"
+              }}
+            >
+              <source
+                src="https://radio.123radio.org/radio.mp3"
+                type="audio/mpeg"
+              />
+            </audio>
+            <button
+  className="secondary"
+  onClick={() => window.location.href = "/dj"}
+>
+  DJ Login
+</button>
+          </div>
+        </div>
+
+        <div className="liveCard">
+          <div className="artwork">
+            <Signal size={58} />
+          </div>
+          <div className="cardMeta">
+            <p>Channel 1</p>
+            <h2>123 Radio Live Stream</h2>
+            <span>Broadcasting live for the love.</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="channelGrid">
+        <div className="channel active">
+          <p>Channel 1</p>
+          <h3>Live Radio</h3>
+          <span>Primary station feed</span>
+        </div>
+        <div className="channel">
+          <p>Channel 2</p>
+          <h3>Guest Stream</h3>
+          <span>Remote creator takeovers</span>
+        </div>
+        <div className="channel">
+          <p>Fallback</p>
+          <h3>Station Automation</h3>
+          <span>Scheduled playout when nobody is live</span>
+        </div>
+      </section>
+
+      <section className="split">
+        <div>
+          <div className="sectionTitle">
+            <CalendarDays size={21} />
+            <h2>Coming Up</h2>
+          </div>
+          <div className="schedule emptyState">
+            <h3>Schedule Coming Soon</h3>
+            <p>Programming will appear here once shows are announced.</p>
+          </div>
+        </div>
+
+        <aside className="creatorPanel">
+          <Lock size={22} />
+          <h2>DJ Login</h2>
+          <p>
+            Private creator access for remote broadcasting. DJs can load files, use an external audio interface,
+            mix two decks, and eventually push the final feed into the station ingest.
+          </p>
+          <button
+  className="secondary"
+  onClick={() => window.location.href = "/dj"}
+>
+  DJ Login
+</button>
+        </aside>
+      </section>
+
+      <section>
+        <div className="sectionTitle">
+          <Library size={21} />
+          <h2>Archive</h2>
+        </div>
+        <div className="archiveGrid blankArchive">
+          <article className="archiveCard emptyArchiveCard">
+            <div className="miniArt">—</div>
+            <h3>Archives Coming Soon</h3>
+            <p>Past broadcasts will live here.</p>
+            <span>Shows TBA</span>
+          </article>
+        </div>
+      </section>
+
+      <footer className="footer">
+        <div>
+          <h2>123 RADIO</h2>
+          <p>Public site + remote DJ booth prototype.</p>
+        </div>
+        <button
+  className="secondary"
+  onClick={() => window.location.href = "/dj"}
+>
+  DJ Login
+</button>
+      </footer>
+    </main>
   );
-  }
-    
+}
 
 function Deck({ name, side, onFile, onPlayPause, playing, onGain, onEq }) {
   return (
