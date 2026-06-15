@@ -117,3 +117,72 @@ h2 {
   margin-bottom: 14px;
   font-size: 22px;
 }
+
+.booth {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.boothHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 48px;
+}
+
+.boothTitle {
+  font-size: 32px;
+}
+
+.statusPanel {
+  margin-bottom: 48px;
+}
+
+.statusLight.live {
+  color: #00ff66;
+}
+
+.statusLight.offline {
+  color: #888;
+}
+
+.statusText {
+  margin-top: 8px;
+  opacity: 0.75;
+}
+
+.masterPanel {
+  margin-bottom: 48px;
+}
+
+.masterActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.goLiveButton {
+  font-weight: bold;
+}
+
+.deckGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+
+.deck h2 {
+  margin-bottom: 16px;
+}
+
+.trackName {
+  margin-bottom: 16px;
+  opacity: 0.7;
+}
+
+@media (max-width: 900px) {
+  .deckGrid {
+    grid-template-columns: 1fr;
+  }
+}

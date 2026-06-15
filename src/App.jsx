@@ -172,235 +172,97 @@ function Deck({ name, side, onFile, onPlayPause, playing, onGain, onEq }) {
   );
 }
 
-function CreatorBooth({ setView }) {
-  const ctxRef = useRef(null);
-  const audioEls = useRef({ a: null, b: null });
-  const deckRefs = useRef({ a: null, b: null });
-  const masterRef = useRef(null);
-  const destRef = useRef(null);
-  const micRef = useRef(null);
-  const socketRef = useRef(null);
-  const recorderRef = useRef(null);
-  const [playing, setPlaying] = useState({ a: false, b: false });
-  const [micOn, setMicOn] = useState(false);
-  const [broadcasting, setBroadcasting] = useState(false);
-  const [status, setStatus] = useState("Offline / local preview");
-  
+<main className="booth">
 
-  function ensureAudio() {
-    if (!ctxRef.current) {
-      const ctx = new AudioContext();
-      const master = ctx.createGain();
-      const destination = ctx.createMediaStreamDestination();
-      master.gain.value = 0.9;
-      master.connect(ctx.destination);
-      master.connect(destination);
-      ctxRef.current = ctx;
-      masterRef.current = master;
-      destRef.current = destination;
-    }
-    return ctxRef.current;
-  }
+  <header className="boothHeader">
+    <button
+      className="minimalLink"
+      onClick={() => window.location.href="/"}
+    >
+      ← RETURN TO STATION
+    </button>
 
-  function loadFile(deck, file) {
-    const ctx = ensureAudio();
-    if (!file) return;
+    <div className="boothTitle">
+      DJ BOOTH
+    </div>
+  </header>
 
-    if (!audioEls.current[deck]) {
-      const audio = new Audio();
-      audio.crossOrigin = "anonymous";
-      const source = ctx.createMediaElementSource(audio);
-      const deckChain = makeDeck(ctx, source);
-      deckChain.gain.connect(masterRef.current);
-      audioEls.current[deck] = audio;
-      deckRefs.current[deck] = deckChain;
-    }
+  <section className="statusPanel">
 
-    audioEls.current[deck].src = URL.createObjectURL(file);
-    audioEls.current[deck].load();
-    setStatus(`${deck.toUpperCase()} loaded: ${file.name}`);
-  }
+    <div className={`statusLight ${broadcasting ? "live" : "offline"}`}>
+      {broadcasting ? "● LIVE" : "○ OFFLINE"}
+    </div>
 
-  async function togglePlay(deck) {
-    const ctx = ensureAudio();
-    await ctx.resume();
-    const audio = audioEls.current[deck];
-    if (!audio) {
-      setStatus(`Load a track into Deck ${deck.toUpperCase()} first.`);
-      return;
-    }
+    <div className="statusText">
+      {status}
+    </div>
 
-    if (audio.paused) {
-      await audio.play();
-      setPlaying((p) => ({ ...p, [deck]: true }));
-    } else {
-      audio.pause();
-      setPlaying((p) => ({ ...p, [deck]: false }));
-    }
-  }
+  </section>
 
-  function setDeckGain(deck, value) {
-    const chain = deckRefs.current[deck];
-    if (chain) chain.gain.gain.value = value;
-  }
+  <section className="masterPanel">
 
-  function setDeckEq(deck, band, value) {
-    const chain = deckRefs.current[deck];
-    if (!chain) return;
-    if (band === "low") chain.low.gain.value = value;
-    if (band === "mid") chain.mid.gain.value = value;
-    if (band === "high") chain.high.gain.value = value;
-  }
+    <h2>MASTER</h2>
 
-  function crossfade(value) {
-    const a = deckRefs.current.a;
-    const b = deckRefs.current.b;
-    const x = +value;
-    if (a) a.gain.gain.value = Math.cos(x * Math.PI / 2);
-    if (b) b.gain.gain.value = Math.cos((1 - x) * Math.PI / 2);
-  }
+    <label>Crossfade</label>
 
-  async function toggleMic() {
-    const ctx = ensureAudio();
-    await ctx.resume();
+    {/* existing crossfade slider */}
 
-    if (micOn && micRef.current) {
-      micRef.current.stream.getTracks().forEach((t) => t.stop());
-      micRef.current.node.disconnect();
-      micRef.current = null;
-      setMicOn(false);
-      setStatus("External input off");
-      return;
-    }
+    <div className="masterActions">
 
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const node = ctx.createMediaStreamSource(stream);
-    const gain = ctx.createGain();
-    gain.gain.value = 0.85;
-    node.connect(gain);
-    gain.connect(masterRef.current);
-    micRef.current = { stream, node, gain };
-    setMicOn(true);
-    setStatus("External input live");
-  }
+      <button
+        className="externalButton"
+        onClick={toggleExternalInput}
+      >
+        EXTERNAL INPUT
+      </button>
 
-  async function fakeBroadcast() {
-    ensureAudio();
+      <button
+        className="goLiveButton"
+        onClick={fakeBroadcast}
+      >
+        {broadcasting ? "END BROADCAST" : "GO LIVE"}
+      </button>
 
-    if (!broadcasting) {
-      try {
-        const socket = new WebSocket("wss://broadcast.123radio.org");
+    </div>
 
-        socketRef.current = socket;
+  </section>
 
-        socket.onopen = () => {
-          const recorder = new MediaRecorder(
-            destRef.current.stream,
-            {
-              mimeType: "audio/webm"
-            }
-          );
+  <section className="deckGrid">
 
-          recorderRef.current = recorder;
+    <section className="deck">
 
-          recorder.ondataavailable = (e) => {
-            if (
-              e.data.size > 0 &&
-              socket.readyState === WebSocket.OPEN
-            ) {
-              socket.send(e.data);
-            }
-          };
+      <h2>DECK A</h2>
 
-          recorder.start(250);
-
-          setBroadcasting(true);
-          setStatus("Connected to 123 Radio ingest");
-        };
-
-        socket.onerror = (err) => {
-          console.error(err);
-          setStatus("WebSocket connection failed");
-        };
-
-        socket.onclose = () => {
-          setStatus("Socket disconnected");
-        };
-      } catch (err) {
-        console.error(err);
-        setStatus("Connection error");
-      }
-    } else {
-      recorderRef.current?.stop();
-      socketRef.current?.close();
-
-      setBroadcasting(false);
-      setStatus("Broadcast stopped");
-    }
-  }
-
-  return (
-    <main className="boothPage">
-      <header className="topbar">
-      <button onClick={() => window.location.href = "/"}>
-  ← Back to123 Radio </button>
-        <div className="brand">
-          <Radio />
-          <div>
-            <h1>DJ Booth</h1>
-            <p>Remote broadcast console</p>
-          </div>
-        </div>
-        <div className={broadcasting ? "livePill onAir" : "livePill"}>{broadcasting ? "ON AIR SIM" : "LOCAL PREVIEW"}</div>
-      </header>
-
-      <div className="grid">
-        <Deck name="Deck A" side="Source One" playing={playing.a}
-          onFile={(e) => loadFile("a", e.target.files[0])}
-          onPlayPause={() => togglePlay("a")}
-          onGain={(v) => setDeckGain("a", v)}
-          onEq={(band, v) => setDeckEq("a", band, v)}
-        />
-
-        <section className="mixer">
-          <p className="eyebrow">Mixer</p>
-          <h2>Master Control</h2>
-
-          <label className="crossfader">
-            Crossfade
-            <input type="range" min="0" max="1" step="0.01" defaultValue="0.5" onChange={(e) => crossfade(e.target.value)} />
-            <div className="ab"><span>A</span><span>B</span></div>
-          </label>
-
-          <button className={micOn ? "mic active" : "mic"} onClick={toggleMic}>
-            <Mic2 size={18} />
-            {micOn ? "External Input On" : "External Input"}
-          </button>
-
-          <button className={broadcasting ? "broadcastButton stop" : "broadcastButton"} onClick={fakeBroadcast}>
-            <Headphones size={18} />
-            {broadcasting ? "Stop Broadcast" : "Go Live"}
-          </button>
-
-          <div className="status">
-            <span>Status</span>
-            <strong>{status}</strong>
-          </div>
-
-          <div className="note">
-            The master mix is routed to a browser MediaStreamDestination. The next production step is sending this stream to a WebRTC ingest server, then encoding to Icecast or LibreTime.
-          </div>
-        </section>
-
-        <Deck name="Deck B" side="Source Two" playing={playing.b}
-          onFile={(e) => loadFile("b", e.target.files[0])}
-          onPlayPause={() => togglePlay("b")}
-          onGain={(v) => setDeckGain("b", v)}
-          onEq={(band, v) => setDeckEq("b", band, v)}
-        />
+      <div className="trackName">
+        {deckATrack?.name || "No track loaded"}
       </div>
-    </main>
-  );
-}
+
+      {/* existing file picker */}
+
+      {/* existing play button */}
+
+      {/* existing EQ controls */}
+
+    </section>
+
+    <section className="deck">
+
+      <h2>DECK B</h2>
+
+      <div className="trackName">
+        {deckBTrack?.name || "No track loaded"}
+      </div>
+
+      {/* existing file picker */}
+
+      {/* existing play button */}
+
+      {/* existing EQ controls */}
+
+    </section>
+
+  </section>
+
+</main>
 
 createRoot(document.getElementById("root")).render(<App />);
