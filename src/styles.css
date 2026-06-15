@@ -186,3 +186,31 @@ h2 {
     grid-template-columns: 1fr;
   }
 }
+.boothHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 48px;
+}
+
+.boothTitle {
+  font-size: 32px;
+}
+
+.statusLight.live {
+  color: #00ff66;
+}
+
+.statusLight.offline {
+  color: #777;
+}
+
+.masterActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.goLiveButton {
+  font-weight: 700;
+}
