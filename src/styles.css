@@ -90,10 +90,10 @@ button {
 }
 
 audio {
-  width: 100%;
-  
-  margin-top: 24px;
-  display: block;
+    width: calc(100vw - 48px);
+    max-width: none;
+    display: block;
+    margin-top: 24px;
 }
 
 .divider {
