@@ -110,12 +110,32 @@ function StationLanding() {
   {currentTrack}
 </p>
 
-  <audio controls preload="none">
-    <source
-      src="https://radio.123radio.org/radio.mp3"
-      type="audio/mpeg"
-    />
-  </audio>
+<div className="playerBar">
+  <button
+    className="playButton"
+    onClick={() => {
+      const audio = document.getElementById("radioStream");
+
+      if (audio.paused) {
+        audio.play();
+      } else {
+        audio.pause();
+      }
+    }}
+  >
+    ▶ PLAY
+  </button>
+
+  <audio
+    id="radioStream"
+    preload="none"
+    src="https://radio.123radio.org/radio.mp3"
+  />
+
+  <div className="streamLabel">
+    {currentTrack}
+  </div>
+</div>
 
 </section>
   
