@@ -13,6 +13,7 @@ import {
 } from "react-router-dom";
 
 import Chat from "./components/Chat.jsx";
+import UpcomingShows from "./components/UpcomingShows.jsx";
 
 
 
@@ -142,16 +143,8 @@ function StationLanding() {
             </div>
 
             <Chat />
-          </section>
 
-          <section className="divider">────────────────────────</section>
-
-          <section>
-            <h2>UPCOMING</h2>
-            <ul className="simpleList">
-              <li>7 PM — Jeff</li>
-              <li>9 PM — Guest</li>
-            </ul>
+            <UpcomingShows />
           </section>
 
           <section className="divider">────────────────────────</section>

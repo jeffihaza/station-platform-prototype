@@ -635,6 +635,83 @@ h2 {
   margin-bottom: 12px;
 }
 
+.upcomingShows {
+  margin-top: 48px;
+}
+
+.upcomingDivider {
+  border-top: 1px solid #333;
+  margin: 24px 0;
+}
+
+.upcomingHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.upcomingHeader h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
+.upcomingLink {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.upcomingLink:hover {
+  opacity: 1;
+}
+
+.upcomingList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.upcomingItem {
+  padding: 14px 0;
+  border-bottom: 1px solid #222;
+}
+
+.upcomingItem:last-child {
+  border-bottom: none;
+}
+
+.upcomingTitle {
+  margin: 0 0 6px;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+}
+
+.upcomingMeta {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.7;
+  letter-spacing: 0.04em;
+}
+
+.upcomingDescription {
+  margin: 8px 0 0;
+  font-size: 13px;
+  opacity: 0.65;
+  line-height: 1.5;
+}
+
+.upcomingEmpty {
+  margin: 0;
+  font-size: 16px;
+  opacity: 0.75;
+  letter-spacing: 0.04em;
+}
+
 @media (max-width: 768px) {
   .chatPanel {
     height: 260px;

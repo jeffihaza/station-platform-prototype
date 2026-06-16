@@ -8,6 +8,7 @@
   "dependencies": {
     "@vitejs/plugin-react": "latest",
     "lucide-react": "latest",
+    "node-ical": "^0.26.1",
     "pusher": "^5.3.4",
     "pusher-js": "^8.5.0",
     "react": "latest",
