@@ -357,3 +357,25 @@ audio {
   letter-spacing: 0.08em;
 }
 
+.pageBackground {
+  position: fixed;
+  inset: 0;
+
+  background-image:
+    linear-gradient(
+      rgba(0,0,0,.72),
+      rgba(0,0,0,.72)
+    ),
+    url("/rain-night.jpg");
+
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+
+  z-index: -1;
+}
+@media (max-width: 768px) {
+  .pageBackground {
+    background-position: center top;
+  }
+}
