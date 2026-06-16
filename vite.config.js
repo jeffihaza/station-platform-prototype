@@ -14,7 +14,13 @@ export default defineConfig(({ mode }) => {
 
   if (!env.PUSHER_APP_ID) {
     console.warn(
-      "[chat] Pusher env vars missing. Add PUSHER_* to .env.local for local chat."
+      "[chat] Server Pusher env vars missing. Add PUSHER_* to .env.local."
+    );
+  }
+
+  if (!env.VITE_PUSHER_KEY) {
+    console.warn(
+      "[chat] Client Pusher env vars missing. Add VITE_PUSHER_KEY and VITE_PUSHER_CLUSTER to .env.local."
     );
   }
 

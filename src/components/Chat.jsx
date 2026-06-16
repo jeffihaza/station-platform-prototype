@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import Pusher from "pusher-js";
 
 const USERNAME_KEY = "radio_username";
-const CHAT_CHANNEL = "123radio-chat";
+const CHAT_CHANNEL = "radio-chat";
+const CHAT_EVENT = "new-message";
 const MAX_MESSAGE_LENGTH = 300;
 
 function isNearBottom(element, threshold = 80) {
@@ -78,12 +79,12 @@ export default function Chat() {
     let pusher = null;
     let channel = null;
 
+    const pusherKey = import.meta.env.VITE_PUSHER_KEY;
+    const pusherCluster = import.meta.env.VITE_PUSHER_CLUSTER;
+
     async function init() {
       try {
-        const [historyRes, configRes] = await Promise.all([
-          fetch("/api/chat/history"),
-          fetch("/api/chat/config")
-        ]);
+        const historyRes = await fetch("/api/chat/history");
 
         if (!historyRes.ok) {
           console.error("[chat] history failed:", historyRes.status);
@@ -91,25 +92,23 @@ export default function Chat() {
           return;
         }
 
-        if (!configRes.ok) {
-          console.error("[chat] config failed:", configRes.status);
-          setError("Chat unavailable.");
-          return;
-        }
-
         const history = await historyRes.json();
-        const config = await configRes.json();
-
         setMessages(history.messages || []);
 
-        if (!config.key || !config.cluster) {
-          console.error("[chat] missing Pusher config:", config);
+        if (!pusherKey || !pusherCluster) {
+          console.error("[chat] missing VITE_PUSHER_KEY or VITE_PUSHER_CLUSTER");
           setError("Chat unavailable.");
           return;
         }
 
-        pusher = new Pusher(config.key, {
-          cluster: config.cluster
+        console.log("[chat] connecting Pusher", {
+          channel: CHAT_CHANNEL,
+          event: CHAT_EVENT,
+          cluster: pusherCluster
+        });
+
+        pusher = new Pusher(pusherKey, {
+          cluster: pusherCluster
         });
 
         pusher.connection.bind("error", (err) => {
@@ -117,22 +116,26 @@ export default function Chat() {
         });
 
         pusher.connection.bind("state_change", (states) => {
-          if (states.current === "failed" || states.current === "unavailable") {
-            console.error("[chat] Pusher connection state:", states.current);
-          }
+          console.log(
+            "[chat] Pusher state:",
+            states.previous,
+            "->",
+            states.current
+          );
         });
 
         channel = pusher.subscribe(CHAT_CHANNEL);
 
         channel.bind("pusher:subscription_succeeded", () => {
-          console.log("[chat] subscribed to", CHAT_CHANNEL);
+          console.log("[chat] subscribed to channel:", CHAT_CHANNEL);
         });
 
         channel.bind("pusher:subscription_error", (status) => {
-          console.error("[chat] subscription error:", status);
+          console.error("[chat] subscription error on", CHAT_CHANNEL, status);
         });
 
-        channel.bind("new-message", (message) => {
+        channel.bind(CHAT_EVENT, (message) => {
+          console.log("[chat] received new-message:", message);
           appendMessage(message);
         });
 
@@ -201,6 +204,7 @@ export default function Chat() {
       });
 
       const data = await res.json();
+      console.log("[chat] send API response:", res.status, data);
 
       if (!res.ok || !data.ok) {
         console.error("[chat] send failed:", res.status, data);
