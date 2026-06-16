@@ -12,8 +12,10 @@ module.exports = async function handler(req, res) {
 
   const expectedPassword = process.env.DJ_PASSWORD;
 
+  console.log("[dj-auth] DJ_PASSWORD set:", Boolean(expectedPassword));
+
   if (!expectedPassword) {
-    return res.status(500).json({ ok: false });
+    return res.status(500).json({ error: "DJ_PASSWORD env var missing" });
   }
 
   const clientKey =
