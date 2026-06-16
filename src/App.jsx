@@ -85,8 +85,7 @@ function StationLanding() {
     <>
       <div className="pageBackground" />
 
-      <main className="stationLayout">
-        <div className="stationPlayerColumn">
+      <main className="stationMinimal">
           <header className="minimalHeader">
             <div>123 RADIO</div>
 
@@ -141,6 +140,8 @@ function StationLanding() {
 
               <div className="streamLabel">{currentTrack}</div>
             </div>
+
+            <Chat />
           </section>
 
           <section className="divider">────────────────────────</section>
@@ -163,9 +164,6 @@ function StationLanding() {
               <li>Room 003</li>
             </ul>
           </section>
-        </div>
-
-        <Chat />
       </main>
     </>
   );

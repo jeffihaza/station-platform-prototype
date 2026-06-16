@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Pusher from "pusher-js";
 
 const USERNAME_KEY = "radio_username";
@@ -9,7 +9,7 @@ function isNearBottom(element, threshold = 80) {
   return element.scrollHeight - element.scrollTop - element.clientHeight < threshold;
 }
 
-function NameModal({ onJoin }) {
+function NameModal({ onJoin, onClose }) {
   const [name, setName] = useState("");
 
   function handleSubmit(e) {
@@ -23,8 +23,8 @@ function NameModal({ onJoin }) {
   }
 
   return (
-    <div className="chatNameOverlay">
-      <div className="chatNameModal">
+    <div className="chatNameOverlay" onClick={onClose}>
+      <div className="chatNameModal" onClick={(e) => e.stopPropagation()}>
         <h2>Choose a name</h2>
         <form onSubmit={handleSubmit}>
           <input
@@ -49,9 +49,7 @@ export default function Chat() {
   const [username, setUsername] = useState(
     () => localStorage.getItem(USERNAME_KEY) || ""
   );
-  const [showNameModal, setShowNameModal] = useState(
-    () => !localStorage.getItem(USERNAME_KEY)
-  );
+  const [showNameModal, setShowNameModal] = useState(false);
   const [messages, setMessages] = useState([]);
   const [draft, setDraft] = useState("");
   const [error, setError] = useState("");
@@ -59,10 +57,26 @@ export default function Chat() {
   const [ready, setReady] = useState(false);
 
   const messagesRef = useRef(null);
+  const inputRef = useRef(null);
   const shouldStickRef = useRef(true);
+  const pendingSendRef = useRef(false);
+
+  const appendMessage = useCallback((message) => {
+    if (!message?.id) {
+      return;
+    }
+
+    setMessages((current) => {
+      if (current.some((entry) => entry.id === message.id)) {
+        return current;
+      }
+      return [...current, message];
+    });
+  }, []);
 
   useEffect(() => {
     let pusher = null;
+    let channel = null;
 
     async function init() {
       try {
@@ -71,7 +85,14 @@ export default function Chat() {
           fetch("/api/chat/config")
         ]);
 
-        if (!historyRes.ok || !configRes.ok) {
+        if (!historyRes.ok) {
+          console.error("[chat] history failed:", historyRes.status);
+          setError("Chat unavailable.");
+          return;
+        }
+
+        if (!configRes.ok) {
+          console.error("[chat] config failed:", configRes.status);
           setError("Chat unavailable.");
           return;
         }
@@ -81,17 +102,43 @@ export default function Chat() {
 
         setMessages(history.messages || []);
 
+        if (!config.key || !config.cluster) {
+          console.error("[chat] missing Pusher config:", config);
+          setError("Chat unavailable.");
+          return;
+        }
+
         pusher = new Pusher(config.key, {
           cluster: config.cluster
         });
 
-        const channel = pusher.subscribe(CHAT_CHANNEL);
+        pusher.connection.bind("error", (err) => {
+          console.error("[chat] Pusher connection error:", err);
+        });
+
+        pusher.connection.bind("state_change", (states) => {
+          if (states.current === "failed" || states.current === "unavailable") {
+            console.error("[chat] Pusher connection state:", states.current);
+          }
+        });
+
+        channel = pusher.subscribe(CHAT_CHANNEL);
+
+        channel.bind("pusher:subscription_succeeded", () => {
+          console.log("[chat] subscribed to", CHAT_CHANNEL);
+        });
+
+        channel.bind("pusher:subscription_error", (status) => {
+          console.error("[chat] subscription error:", status);
+        });
+
         channel.bind("new-message", (message) => {
-          setMessages((current) => [...current, message]);
+          appendMessage(message);
         });
 
         setReady(true);
-      } catch {
+      } catch (err) {
+        console.error("[chat] init failed:", err);
         setError("Chat unavailable.");
       }
     }
@@ -99,12 +146,15 @@ export default function Chat() {
     init();
 
     return () => {
+      if (channel) {
+        channel.unbind_all();
+      }
       if (pusher) {
         pusher.unsubscribe(CHAT_CHANNEL);
         pusher.disconnect();
       }
     };
-  }, []);
+  }, [appendMessage]);
 
   useEffect(() => {
     const element = messagesRef.current;
@@ -122,11 +172,21 @@ export default function Chat() {
     shouldStickRef.current = isNearBottom(element);
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault();
+  function promptForName(attemptSend = false) {
+    pendingSendRef.current = attemptSend;
+    setShowNameModal(true);
+  }
 
+  function handleInputFocus() {
+    if (!username) {
+      inputRef.current?.blur();
+      promptForName(false);
+    }
+  }
+
+  async function sendMessage(activeUsername) {
     const trimmed = draft.trim();
-    if (!trimmed || !username || !ready) {
+    if (!trimmed || !activeUsername || !ready) {
       return;
     }
 
@@ -137,27 +197,57 @@ export default function Chat() {
       const res = await fetch("/api/chat/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, message: trimmed })
+        body: JSON.stringify({ username: activeUsername, message: trimmed })
       });
 
       const data = await res.json();
 
-      if (!data.ok) {
+      if (!res.ok || !data.ok) {
+        console.error("[chat] send failed:", res.status, data);
         setError(data.error || "Could not send message.");
         return;
       }
 
+      if (data.message) {
+        appendMessage(data.message);
+      }
+
       setDraft("");
       shouldStickRef.current = true;
-    } catch {
+    } catch (err) {
+      console.error("[chat] send error:", err);
       setError("Could not send message.");
     } finally {
       setSending(false);
     }
   }
 
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    if (!username) {
+      promptForName(true);
+      return;
+    }
+
+    await sendMessage(username);
+  }
+
+  async function handleNameJoin(name) {
+    setUsername(name);
+    setShowNameModal(false);
+
+    if (pendingSendRef.current && draft.trim()) {
+      pendingSendRef.current = false;
+      await sendMessage(name);
+      return;
+    }
+
+    inputRef.current?.focus();
+  }
+
   return (
-    <aside className="chatPanel">
+    <section className="chatPanel">
       <div className="chatHeader">
         <p className="chatEyebrow">CHAT</p>
       </div>
@@ -175,44 +265,37 @@ export default function Chat() {
         ))}
       </div>
 
-      {username ? (
-        <form className="chatComposer" onSubmit={handleSubmit}>
-          <input
-            className="chatInput"
-            type="text"
-            value={draft}
-            onChange={(e) => setDraft(e.target.value.slice(0, MAX_MESSAGE_LENGTH))}
-            placeholder="Say something"
-            disabled={sending || !ready}
-          />
-          <button
-            className="chatSendButton"
-            type="submit"
-            disabled={sending || !ready || !draft.trim()}
-          >
-            Send
-          </button>
-        </form>
-      ) : (
+      <form className="chatComposer" onSubmit={handleSubmit}>
+        <input
+          ref={inputRef}
+          className="chatInput"
+          type="text"
+          value={draft}
+          onFocus={handleInputFocus}
+          onChange={(e) => setDraft(e.target.value.slice(0, MAX_MESSAGE_LENGTH))}
+          placeholder="Say something"
+          disabled={sending || !ready}
+        />
         <button
-          className="chatJoinPrompt"
-          type="button"
-          onClick={() => setShowNameModal(true)}
+          className="chatSendButton"
+          type="submit"
+          disabled={sending || !ready || !draft.trim()}
         >
-          Choose a name to chat
+          Send
         </button>
-      )}
+      </form>
 
       {error && <p className="chatError">{error}</p>}
 
       {showNameModal && (
         <NameModal
-          onJoin={(name) => {
-            setUsername(name);
+          onJoin={handleNameJoin}
+          onClose={() => {
+            pendingSendRef.current = false;
             setShowNameModal(false);
           }}
         />
       )}
-    </aside>
+    </section>
   );
 }
