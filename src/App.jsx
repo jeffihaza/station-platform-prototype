@@ -302,13 +302,100 @@ function CreatorBoothControls() {
   const destRef = useRef(null);
   const micRef = useRef(null);
   const socketRef = useRef(null);
-  const recorderRef = useRef(null);
+  const broadcastRecorderRef = useRef(null);
+  const localRecorderRef = useRef(null);
+  const localChunksRef = useRef([]);
+  const recordingTimerRef = useRef(null);
+  const recordingBlobUrlRef = useRef(null);
   const [playing, setPlaying] = useState({ a: false, b: false });
   const [micOn, setMicOn] = useState(false);
   const [broadcasting, setBroadcasting] = useState(false);
   const [status, setStatus] = useState("Offline / local preview");
   const [showTitle, setShowTitle] = useState("");
-  
+  const [recordingSupported, setRecordingSupported] = useState(true);
+  const [recording, setRecording] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [recordingBlobUrl, setRecordingBlobUrl] = useState(null);
+  const [recordingFilename, setRecordingFilename] = useState("");
+
+  function getRecordingMimeType() {
+    if (typeof MediaRecorder === "undefined") {
+      return null;
+    }
+
+    if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) {
+      return "audio/webm;codecs=opus";
+    }
+
+    if (MediaRecorder.isTypeSupported("audio/webm")) {
+      return "audio/webm";
+    }
+
+    return null;
+  }
+
+  function formatRecordingFilename(date = new Date()) {
+    const pad = (value) => String(value).padStart(2, "0");
+    return [
+      "123radio",
+      date.getFullYear(),
+      pad(date.getMonth() + 1),
+      pad(date.getDate()),
+      `${pad(date.getHours())}${pad(date.getMinutes())}`
+    ].join("-") + ".webm";
+  }
+
+  function formatElapsedTime(totalSeconds) {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  }
+
+  function hasActiveAudio() {
+    const deckLoaded = Boolean(
+      audioEls.current.a?.src || audioEls.current.b?.src
+    );
+    return deckLoaded || micOn || playing.a || playing.b;
+  }
+
+  useEffect(() => {
+    setRecordingSupported(Boolean(getRecordingMimeType()));
+  }, []);
+
+  useEffect(() => {
+    if (!recording) {
+      return undefined;
+    }
+
+    recordingTimerRef.current = window.setInterval(() => {
+      setRecordingSeconds((current) => current + 1);
+    }, 1000);
+
+    function handleBeforeUnload(event) {
+      event.preventDefault();
+      event.returnValue = "";
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.clearInterval(recordingTimerRef.current);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [recording]);
+
+  useEffect(() => {
+    recordingBlobUrlRef.current = recordingBlobUrl;
+  }, [recordingBlobUrl]);
+
+  useEffect(() => {
+    return () => {
+      localRecorderRef.current?.stop();
+      if (recordingBlobUrlRef.current) {
+        URL.revokeObjectURL(recordingBlobUrlRef.current);
+      }
+    };
+  }, []);
 
   function ensureAudio() {
     if (!ctxRef.current) {
@@ -407,6 +494,86 @@ function CreatorBoothControls() {
     setStatus("External input live");
   }
 
+  async function startLocalRecording() {
+    const mimeType = getRecordingMimeType();
+
+    if (!mimeType) {
+      setStatus("Recording is not supported in this browser.");
+      return;
+    }
+
+    ensureAudio();
+    await ctxRef.current.resume();
+
+    if (!hasActiveAudio()) {
+      setStatus("Load a track or enable external input before recording.");
+      return;
+    }
+
+    if (recordingBlobUrl) {
+      URL.revokeObjectURL(recordingBlobUrl);
+      setRecordingBlobUrl(null);
+      setRecordingFilename("");
+    }
+
+    localChunksRef.current = [];
+
+    const recorder = new MediaRecorder(destRef.current.stream, { mimeType });
+    localRecorderRef.current = recorder;
+
+    recorder.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        localChunksRef.current.push(event.data);
+      }
+    };
+
+    recorder.onerror = () => {
+      setStatus("Recording failed.");
+      setRecording(false);
+      localRecorderRef.current = null;
+    };
+
+    recorder.start(1000);
+    setRecording(true);
+    setRecordingSeconds(0);
+    setStatus("Recording");
+  }
+
+  function stopLocalRecording() {
+    const recorder = localRecorderRef.current;
+
+    if (!recorder || recorder.state === "inactive") {
+      return;
+    }
+
+    recorder.onstop = () => {
+      const mimeType = getRecordingMimeType() || "audio/webm";
+      const blob = new Blob(localChunksRef.current, { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const filename = formatRecordingFilename();
+
+      setRecordingBlobUrl(url);
+      setRecordingFilename(filename);
+      localRecorderRef.current = null;
+      localChunksRef.current = [];
+      setRecording(false);
+      setStatus("Recording stopped — ready to download");
+    };
+
+    recorder.stop();
+  }
+
+  function downloadRecording() {
+    if (!recordingBlobUrl) {
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.href = recordingBlobUrl;
+    link.download = recordingFilename || formatRecordingFilename();
+    link.click();
+  }
+
   async function fakeBroadcast() {
     ensureAudio();
 
@@ -434,7 +601,7 @@ function CreatorBoothControls() {
             }
           );
 
-          recorderRef.current = recorder;
+          broadcastRecorderRef.current = recorder;
 
           recorder.ondataavailable = (e) => {
             if (
@@ -464,7 +631,7 @@ function CreatorBoothControls() {
         setStatus("Connection error");
       }
     } else {
-      recorderRef.current?.stop();
+      broadcastRecorderRef.current?.stop();
       socketRef.current?.close();
 
       setBroadcasting(false);
@@ -562,6 +729,53 @@ function CreatorBoothControls() {
       {status}
     </div>
 
+  </section>
+
+  <section className="recordingPanel">
+    <h2>RECORDING</h2>
+
+    {!recordingSupported ? (
+      <p className="recordingNotice">
+        Recording is not supported in this browser.
+      </p>
+    ) : (
+      <>
+        <div className="recordingActions">
+          <button
+            type="button"
+            className="recordButton"
+            onClick={startLocalRecording}
+            disabled={recording || !hasActiveAudio()}
+          >
+            Start Recording
+          </button>
+
+          <button
+            type="button"
+            className="recordButton stop"
+            onClick={stopLocalRecording}
+            disabled={!recording}
+          >
+            Stop Recording
+          </button>
+
+          <button
+            type="button"
+            className="recordButton"
+            onClick={downloadRecording}
+            disabled={!recordingBlobUrl}
+          >
+            Download Recording
+          </button>
+        </div>
+
+        {recording && (
+          <p className="recordingStatus">
+            Recording — {formatElapsedTime(recordingSeconds)}
+          </p>
+        )}
+      </>
+    )}
   </section>
 
 </main>

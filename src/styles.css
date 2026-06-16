@@ -279,6 +279,47 @@ h2 {
   opacity: 0.75;
 }
 
+.recordingPanel {
+  border: 1px solid #222;
+  padding: 24px;
+}
+
+.recordingPanel h2 {
+  margin-top: 0;
+}
+
+.recordingActions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.recordButton {
+  border: 1px solid #444;
+  padding: 10px 14px;
+  letter-spacing: 0.06em;
+}
+
+.recordButton.stop {
+  border-color: #884444;
+}
+
+.recordButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.recordingStatus {
+  margin: 16px 0 0;
+  color: #ff6b6b;
+  letter-spacing: 0.06em;
+}
+
+.recordingNotice {
+  margin: 0;
+  opacity: 0.75;
+}
+
 .backButton {
   background: none;
   border: none;
