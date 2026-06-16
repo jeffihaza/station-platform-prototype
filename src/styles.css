@@ -70,11 +70,13 @@ button {
   letter-spacing: 0.08em;
 }
 
-.liveHost {
-  font-size: clamp(64px, 12vw, 128px);
+@media (max-width: 768px) {
+  .liveHost {
+  font-size: clamp(48px, 18vw, 96px);
   line-height: 0.9;
   margin: 0 0 24px;
   font-weight: 600;
+}
 }
 
 .liveLocation {
@@ -305,4 +307,21 @@ h2 {
 .liveLabel {
   margin-bottom: 32px;
   letter-spacing: 0.08em;
+}
+@media (max-width: 768px) {
+  .stationMinimal {
+    padding: 16px;
+    overflow-x: hidden;
+  }
+
+  .liveSection {
+    width: 100%;
+  }
+
+  audio {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    margin-top: 32px;
+  }
 }
