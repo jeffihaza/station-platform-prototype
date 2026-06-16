@@ -363,8 +363,8 @@ audio {
 
   background-image:
     linear-gradient(
-      rgba(0,0,0,.72),
-      rgba(0,0,0,.72)
+      rgba(0,0,0,.78),
+      rgba(0,0,0,.78)
     ),
     url("/rain-night.jpg");
 
