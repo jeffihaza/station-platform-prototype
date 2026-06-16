@@ -225,7 +225,96 @@ function Deck({ name, side, onFile, onPlayPause, playing, onGain, onEq }) {
   );
 }
 
-function CreatorBooth({ setView }) {
+const DJ_AUTH_KEY = "dj_authed";
+
+function DjBoothGate({ onAuthed }) {
+  const [password, setPassword] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setAuthError("");
+    setSubmitting(true);
+
+    try {
+      const res = await fetch("/api/dj-auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ password })
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        sessionStorage.setItem(DJ_AUTH_KEY, "true");
+        onAuthed();
+        return;
+      }
+
+      setAuthError("Wrong password");
+    } catch {
+      setAuthError("Wrong password");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <main className="boothGate">
+      <button
+        className="backButton boothGateBack"
+        onClick={() => { window.location.href = "/"; }}
+      >
+        ← RETURN TO STATION
+      </button>
+
+      <div className="boothGatePanel">
+        <h1>DJ Booth</h1>
+
+        <form className="boothGateForm" onSubmit={handleSubmit}>
+          <input
+            className="boothGateInput"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            disabled={submitting}
+          />
+
+          <button
+            className="boothGateButton"
+            type="submit"
+            disabled={submitting || !password}
+          >
+            Enter Booth
+          </button>
+
+          {authError && (
+            <p className="boothGateError">{authError}</p>
+          )}
+        </form>
+      </div>
+    </main>
+  );
+}
+
+function CreatorBooth() {
+  const [authed, setAuthed] = useState(
+    () => sessionStorage.getItem(DJ_AUTH_KEY) === "true"
+  );
+
+  if (!authed) {
+    return <DjBoothGate onAuthed={() => setAuthed(true)} />;
+  }
+
+  return <CreatorBoothControls />;
+}
+
+function CreatorBoothControls() {
   const ctxRef = useRef(null);
   const audioEls = useRef({ a: null, b: null });
   const deckRefs = useRef({ a: null, b: null });

@@ -325,6 +325,79 @@ h2 {
   color: white;
 }
 
+.boothGate {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+}
+
+.boothGateBack {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+}
+
+.boothGatePanel {
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+}
+
+.boothGatePanel h1 {
+  margin: 0 0 32px;
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+.boothGateForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.boothGateInput {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid #333;
+  color: var(--text);
+  font: inherit;
+  letter-spacing: 0.04em;
+}
+
+.boothGateInput:focus {
+  outline: none;
+  border-color: #666;
+}
+
+.boothGateButton {
+  border: 1px solid #444;
+  padding: 12px 16px;
+  letter-spacing: 0.08em;
+  transition: border-color 0.15s ease;
+}
+
+.boothGateButton:hover:not(:disabled) {
+  border-color: #888;
+}
+
+.boothGateButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.boothGateError {
+  margin: 0;
+  color: #ff6b6b;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
 @media (max-width: 768px) {
   .stationMinimal {
     padding: 16px;
