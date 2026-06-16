@@ -1,5 +1,4 @@
-<>
-  <div className="pageBackground" />
+ <div className="pageBackground" />
 
   <main className="stationMinimal">
     ...
