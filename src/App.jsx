@@ -67,9 +67,8 @@ function StationLanding() {
         data.live ? "ON AIR" : "OFFLINE"
       );
     } catch {
-      setCurrentTrack("OFFLINE");
-    }
-  };
+      
+;
 
   loadStatus();
 
