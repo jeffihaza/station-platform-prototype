@@ -644,30 +644,11 @@ h2 {
   margin: 24px 0;
 }
 
-.upcomingHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.upcomingHeader h2 {
-  margin: 0;
+.upcomingHeading {
+  margin: 0 0 20px;
   font-size: 18px;
   font-weight: 400;
   letter-spacing: 0.05em;
-}
-
-.upcomingLink {
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  opacity: 0.7;
-  white-space: nowrap;
-}
-
-.upcomingLink:hover {
-  opacity: 1;
 }
 
 .upcomingList {

@@ -5,7 +5,8 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ ok: false });
   }
 
-  const result = await fetchUpcomingShows(3);
+  const forceRefresh = req.query?.refresh === "1";
+  const result = await fetchUpcomingShows(3, { forceRefresh });
   const status = result.ok ? 200 : 502;
   return res.status(status).json(result);
 };

@@ -22,8 +22,7 @@ export default function UpcomingShows() {
 
         setState({
           kind: "ready",
-          shows: data.shows || [],
-          calendarUrl: data.calendarUrl
+          shows: data.shows || []
         });
       } catch {
         if (!cancelled) {
@@ -43,19 +42,7 @@ export default function UpcomingShows() {
     <section className="upcomingShows">
       <div className="upcomingDivider" />
 
-      <div className="upcomingHeader">
-        <h2>UPCOMING SHOWS</h2>
-        {state.kind === "ready" && state.calendarUrl && (
-          <a
-            className="upcomingLink"
-            href={state.calendarUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            View Full Schedule &gt;
-          </a>
-        )}
-      </div>
+      <h2 className="upcomingHeading">UPCOMING SHOWS</h2>
 
       {state.kind === "loading" && (
         <p className="upcomingMeta">Loading schedule…</p>
