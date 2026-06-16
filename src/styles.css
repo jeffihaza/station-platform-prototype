@@ -309,6 +309,22 @@ h2 {
   margin-bottom: 32px;
   letter-spacing: 0.08em;
 }
+
+.showTitle {
+  margin-top: 12px;
+  opacity: 0.8;
+  font-size: 18px;
+}
+
+.showTitleInput {
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 8px;
+  background: transparent;
+  border: 1px solid #333;
+  color: white;
+}
+
 @media (max-width: 768px) {
   .stationMinimal {
     padding: 16px;

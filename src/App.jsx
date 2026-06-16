@@ -52,6 +52,7 @@ function App() {
 
 function StationLanding() {
   const [currentTrack, setCurrentTrack] = useState("OFFLINE");
+  const [showTitle, setShowTitle] = useState("");
   const [playing, setPlaying] = useState(false);
   useEffect(() => {
     const loadStatus = async () => {
@@ -61,7 +62,9 @@ function StationLanding() {
         );
   
         const data = await res.json();
-  
+
+        setShowTitle(data.title || "");
+
         setCurrentTrack(
           data.live ? "ON AIR" : "OFFLINE"
         );
@@ -111,6 +114,12 @@ function StationLanding() {
 <p className="liveTrack">
   {currentTrack}
 </p>
+
+{showTitle && currentTrack === "ON AIR" && (
+  <p className="showTitle">
+    {showTitle}
+  </p>
+)}
 
 <div className="playerBar">
 <button
@@ -229,6 +238,7 @@ function CreatorBooth({ setView }) {
   const [micOn, setMicOn] = useState(false);
   const [broadcasting, setBroadcasting] = useState(false);
   const [status, setStatus] = useState("Offline / local preview");
+  const [showTitle, setShowTitle] = useState("");
   
 
   function ensureAudio() {
@@ -333,6 +343,16 @@ function CreatorBooth({ setView }) {
 
     if (!broadcasting) {
       try {
+        await fetch("https://status.123radio.org/title", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            title: showTitle
+          })
+        });
+
         const socket = new WebSocket("wss://broadcast.123radio.org");
 
         socketRef.current = socket;
@@ -447,6 +467,14 @@ function CreatorBooth({ setView }) {
       >
         {micOn ? "EXTERNAL INPUT ON" : "EXTERNAL INPUT"}
       </button>
+
+      <input
+        className="showTitleInput"
+        type="text"
+        placeholder="Show title"
+        value={showTitle}
+        onChange={(e) => setShowTitle(e.target.value)}
+      />
 
       <button
         className={
