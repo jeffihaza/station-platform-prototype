@@ -9,9 +9,10 @@ import "./styles.css";
 import {
   BrowserRouter,
   Routes,
-  Route,
-  Link
+  Route
 } from "react-router-dom";
+
+import Chat from "./components/Chat.jsx";
 
 
 
@@ -83,108 +84,89 @@ function StationLanding() {
   return (
     <>
       <div className="pageBackground" />
-  
-      <main className="stationMinimal">
-    
-    <header className="minimalHeader">
-      <div>123 RADIO</div>
-  
-      <button
-        className="minimalLink"
-        onClick={() => window.location.href="/dj"}
-      >
-        DJ LOGIN
-      </button>
-    </header>
-  
-  <section className="liveSection">
 
-  <div className="liveLabel">
-  LIVE NOW
-</div>
+      <main className="stationLayout">
+        <div className="stationPlayerColumn">
+          <header className="minimalHeader">
+            <div>123 RADIO</div>
 
-<h1 className="liveDate">
-  {new Date().toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric"
-  }).toUpperCase()}
-</h1>
+            <button
+              className="minimalLink"
+              onClick={() => { window.location.href = "/dj"; }}
+            >
+              DJ LOGIN
+            </button>
+          </header>
 
-<p className="liveTrack">
-  {currentTrack}
-</p>
+          <section className="liveSection">
+            <div className="liveLabel">LIVE NOW</div>
 
-{showTitle && currentTrack === "ON AIR" && (
-  <p className="showTitle">
-    {showTitle}
-  </p>
-)}
+            <h1 className="liveDate">
+              {new Date().toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric"
+              }).toUpperCase()}
+            </h1>
 
-<div className="playerBar">
-<button
-  className="playButton"
-  onClick={() => {
-    const audio = document.getElementById("radioStream");
+            <p className="liveTrack">{currentTrack}</p>
 
-    if (audio.paused) {
-      audio.play();
-      setPlaying(true);
-    } else {
-      audio.pause();
-      setPlaying(false);
-    }
-  }}
->
-  {playing ? "❚❚ PAUSE" : "▶ PLAY"}
-</button>
+            {showTitle && currentTrack === "ON AIR" && (
+              <p className="showTitle">{showTitle}</p>
+            )}
 
-  <audio
-    id="radioStream"
-    preload="none"
-    src="https://radio.123radio.org/radio.mp3"
-  />
+            <div className="playerBar">
+              <button
+                className="playButton"
+                onClick={() => {
+                  const audio = document.getElementById("radioStream");
 
-  <div className="streamLabel">
-    {currentTrack}
-  </div>
-</div>
+                  if (audio.paused) {
+                    audio.play();
+                    setPlaying(true);
+                  } else {
+                    audio.pause();
+                    setPlaying(false);
+                  }
+                }}
+              >
+                {playing ? "❚❚ PAUSE" : "▶ PLAY"}
+              </button>
 
-</section>
-  
-    <section className="divider">
-      ────────────────────────
-    </section>
-  
-    <section>
-  
-      <h2>UPCOMING</h2>
-  
-      <ul className="simpleList">
-        <li>7 PM — Jeff</li>
-        <li>9 PM — Guest</li>
-      </ul>
-  
-    </section>
-  
-    <section className="divider">
-      ────────────────────────
-    </section>
-  
-    <section>
-  
-      <h2>RECENT BROADCASTS</h2>
-  
-      <ul className="simpleList">
-        <li>Room 001</li>
-        <li>Room 002</li>
-        <li>Room 003</li>
-      </ul>
-  
-    </section>
-  
-   
-   </main>
+              <audio
+                id="radioStream"
+                preload="none"
+                src="https://radio.123radio.org/radio.mp3"
+              />
+
+              <div className="streamLabel">{currentTrack}</div>
+            </div>
+          </section>
+
+          <section className="divider">────────────────────────</section>
+
+          <section>
+            <h2>UPCOMING</h2>
+            <ul className="simpleList">
+              <li>7 PM — Jeff</li>
+              <li>9 PM — Guest</li>
+            </ul>
+          </section>
+
+          <section className="divider">────────────────────────</section>
+
+          <section>
+            <h2>RECENT BROADCASTS</h2>
+            <ul className="simpleList">
+              <li>Room 001</li>
+              <li>Room 002</li>
+              <li>Room 003</li>
+            </ul>
+          </section>
+        </div>
+
+        <Chat />
+      </main>
     </>
   );
 }

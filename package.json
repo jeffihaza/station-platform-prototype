@@ -8,6 +8,8 @@
   "dependencies": {
     "@vitejs/plugin-react": "latest",
     "lucide-react": "latest",
+    "pusher": "^5.3.4",
+    "pusher-js": "^8.5.0",
     "react": "latest",
     "react-dom": "latest",
     "react-router-dom": "^7.17.0",
