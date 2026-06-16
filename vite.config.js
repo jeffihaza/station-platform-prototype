@@ -19,9 +19,11 @@ export default defineConfig(({ mode }) => {
   }
 
   if (!env.VITE_PUSHER_KEY) {
-    console.warn(
-      "[chat] Client Pusher env vars missing. Add VITE_PUSHER_KEY and VITE_PUSHER_CLUSTER to .env.local."
-    );
+    console.warn("[chat] Missing environment variable: VITE_PUSHER_KEY");
+  }
+
+  if (!env.VITE_PUSHER_CLUSTER) {
+    console.warn("[chat] Missing environment variable: VITE_PUSHER_CLUSTER");
   }
 
   return {

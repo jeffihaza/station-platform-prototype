@@ -6,6 +6,28 @@ const CHAT_CHANNEL = "radio-chat";
 const CHAT_EVENT = "new-message";
 const MAX_MESSAGE_LENGTH = 300;
 
+function getPusherClientEnv() {
+  const key = import.meta.env.VITE_PUSHER_KEY;
+  const cluster = import.meta.env.VITE_PUSHER_CLUSTER;
+  let ok = true;
+
+  if (!key) {
+    console.warn("[chat] Missing environment variable: VITE_PUSHER_KEY");
+    ok = false;
+  }
+
+  if (!cluster) {
+    console.warn("[chat] Missing environment variable: VITE_PUSHER_CLUSTER");
+    ok = false;
+  }
+
+  if (!ok) {
+    return null;
+  }
+
+  return { key, cluster };
+}
+
 function isNearBottom(element, threshold = 80) {
   return element.scrollHeight - element.scrollTop - element.clientHeight < threshold;
 }
@@ -79,10 +101,16 @@ export default function Chat() {
     let pusher = null;
     let channel = null;
 
-    const pusherKey = import.meta.env.VITE_PUSHER_KEY;
-    const pusherCluster = import.meta.env.VITE_PUSHER_CLUSTER;
+    const clientEnv = getPusherClientEnv();
 
     async function init() {
+      if (!clientEnv) {
+        setError("Chat unavailable.");
+        return;
+      }
+
+      const { key: pusherKey, cluster: pusherCluster } = clientEnv;
+
       try {
         const historyRes = await fetch("/api/chat/history");
 
@@ -94,12 +122,6 @@ export default function Chat() {
 
         const history = await historyRes.json();
         setMessages(history.messages || []);
-
-        if (!pusherKey || !pusherCluster) {
-          console.error("[chat] missing VITE_PUSHER_KEY or VITE_PUSHER_CLUSTER");
-          setError("Chat unavailable.");
-          return;
-        }
 
         console.log("[chat] connecting Pusher", {
           channel: CHAT_CHANNEL,
