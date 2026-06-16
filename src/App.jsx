@@ -52,7 +52,7 @@ function App() {
 
 function StationLanding() {
   const [currentTrack, setCurrentTrack] = useState("OFFLINE");
-
+  const [playing, setPlaying] = useState(false);
   useEffect(() => {
     const loadStatus = async () => {
       try {
@@ -110,20 +110,22 @@ function StationLanding() {
 </p>
 
 <div className="playerBar">
-  <button
-    className="playButton"
-    onClick={() => {
-      const audio = document.getElementById("radioStream");
+<button
+  className="playButton"
+  onClick={() => {
+    const audio = document.getElementById("radioStream");
 
-      if (audio.paused) {
-        audio.play();
-      } else {
-        audio.pause();
-      }
-    }}
-  >
-    ▶ PLAY
-  </button>
+    if (audio.paused) {
+      audio.play();
+      setPlaying(true);
+    } else {
+      audio.pause();
+      setPlaying(false);
+    }
+  }}
+>
+  {playing ? "❚❚ PAUSE" : "▶ PLAY"}
+</button>
 
   <audio
     id="radioStream"
@@ -466,3 +468,17 @@ function CreatorBooth({ setView }) {
 }
 
 createRoot(document.getElementById("root")).render(<App />);
+useEffect(() => {
+  const audio = document.getElementById("radioStream");
+
+  const onPlay = () => setPlaying(true);
+  const onPause = () => setPlaying(false);
+
+  audio?.addEventListener("play", onPlay);
+  audio?.addEventListener("pause", onPause);
+
+  return () => {
+    audio?.removeEventListener("play", onPlay);
+    audio?.removeEventListener("pause", onPause);
+  };
+}, []);
