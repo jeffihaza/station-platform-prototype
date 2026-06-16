@@ -93,6 +93,7 @@ audio {
   width: 100%;
   max-width: 520px;
   margin-top: 24px;
+  display: block;
 }
 
 .divider {
