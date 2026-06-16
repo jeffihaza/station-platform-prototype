@@ -328,3 +328,14 @@ h2 {
     margin-top: 32px;
   }
 }
+.stationMinimal {
+  outline: 1px solid red;
+}
+
+.liveSection {
+  outline: 1px solid blue;
+}
+
+audio {
+  outline: 1px solid lime;
+}
