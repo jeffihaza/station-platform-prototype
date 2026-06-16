@@ -58,7 +58,7 @@ function StationLanding() {
     const loadStatus = async () => {
       try {
         const res = await fetch(
-          "https://status.123radio.org"
+          "https://status.123radio.org/"
         );
   
         const data = await res.json();
@@ -77,7 +77,7 @@ function StationLanding() {
   
     return () => clearInterval(interval);
   }, []);
-  
+
   return (
     <main className="stationMinimal">
     
