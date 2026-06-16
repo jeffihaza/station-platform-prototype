@@ -1,10 +1,3 @@
-<>
- <div className="pageBackground" />
-
-  <main className="stationMinimal">
-    ...
-  </main>
-</>
 import React, { useRef, useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -85,7 +78,10 @@ function StationLanding() {
   }, []);
 
   return (
-    <main className="stationMinimal">
+    <>
+      <div className="pageBackground" />
+  
+      <main className="stationMinimal">
     
     <header className="minimalHeader">
       <div>123 RADIO</div>
@@ -180,6 +176,7 @@ function StationLanding() {
   
    
    </main>
+    </>
   );
 }
   
@@ -475,17 +472,3 @@ function CreatorBooth({ setView }) {
 }
 
 createRoot(document.getElementById("root")).render(<App />);
-useEffect(() => {
-  const audio = document.getElementById("radioStream");
-
-  const onPlay = () => setPlaying(true);
-  const onPause = () => setPlaying(false);
-
-  audio?.addEventListener("play", onPlay);
-  audio?.addEventListener("pause", onPause);
-
-  return () => {
-    audio?.removeEventListener("play", onPlay);
-    audio?.removeEventListener("pause", onPause);
-  };
-}, []);
