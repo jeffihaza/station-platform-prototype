@@ -1,3 +1,4 @@
+<>
  <div className="pageBackground" />
 
   <main className="stationMinimal">
