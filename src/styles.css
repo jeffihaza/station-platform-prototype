@@ -693,6 +693,99 @@ h2 {
   letter-spacing: 0.04em;
 }
 
+.archiveShows {
+  margin-top: 0;
+}
+
+.archiveHeading {
+  margin: 0 0 32px;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
+.archiveList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.archiveItem {
+  border-bottom: 1px solid #222;
+}
+
+.archiveItem:last-child {
+  border-bottom: none;
+}
+
+.archiveRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 14px 0;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.archiveRow:hover .archiveTitle {
+  opacity: 0.85;
+}
+
+.archiveArtwork {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #1a1a1a;
+}
+
+.archiveArtworkPlaceholder {
+  display: block;
+}
+
+.archiveDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.archiveTitle {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+}
+
+.archiveMeta {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.7;
+  letter-spacing: 0.04em;
+}
+
+.archiveEmpty {
+  margin: 0;
+  font-size: 16px;
+  opacity: 0.75;
+  letter-spacing: 0.04em;
+}
+
+.archiveEmbed {
+  padding: 0 0 16px;
+}
+
+.archiveEmbed iframe {
+  display: block;
+  border: none;
+  background: transparent;
+}
+
 @media (max-width: 768px) {
   .chatPanel {
     height: 260px;

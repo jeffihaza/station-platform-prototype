@@ -14,6 +14,7 @@ import {
 
 import Chat from "./components/Chat.jsx";
 import UpcomingShows from "./components/UpcomingShows.jsx";
+import Archive from "./components/Archive.jsx";
 
 
 
@@ -149,14 +150,7 @@ function StationLanding() {
 
           <section className="divider">────────────────────────</section>
 
-          <section>
-            <h2>RECENT BROADCASTS</h2>
-            <ul className="simpleList">
-              <li>Room 001</li>
-              <li>Room 002</li>
-              <li>Room 003</li>
-            </ul>
-          </section>
+          <Archive />
       </main>
     </>
   );
