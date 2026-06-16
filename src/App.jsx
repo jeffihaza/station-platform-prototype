@@ -55,28 +55,28 @@ function StationLanding() {
   const [currentTrack, setCurrentTrack] = useState("OFFLINE");
 
   useEffect(() => {
-    const loadStatus = async () => {
-      try {
-        const res = await fetch(
-          "https://status.123radio.org"
-        );
-  
-        const data = await res.json();
-  
-        setCurrentTrack(
-          data.live ? "ON AIR" : "OFFLINE"
-        );
-      } catch {
-        setCurrentTrack("OFFLINE");
-      }
-    };
-  
-    loadStatus();
-  
-    const interval = setInterval(loadStatus, 5000);
-  
-    return () => clearInterval(interval);
-  }, []);
+  const loadStatus = async () => {
+    try {
+      const res = await fetch(
+        "http://137.184.158.254:8091/status"
+      );
+
+      const data = await res.json();
+
+      setCurrentTrack(
+        data.live ? "ON AIR" : "OFFLINE"
+      );
+    } catch {
+      setCurrentTrack("OFFLINE");
+    }
+  };
+
+  loadStatus();
+
+  const interval = setInterval(loadStatus, 5000);
+
+  return () => clearInterval(interval);
+}, []);
 
   return (
     <main className="stationMinimal">
