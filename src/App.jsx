@@ -58,7 +58,7 @@ function StationLanding() {
   const loadStatus = async () => {
     try {
       const res = await fetch(
-        "http://137.184.158.254:8091/status"
+        "https://status.123radio.org"
       );
 
       const data = await res.json();
