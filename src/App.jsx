@@ -54,15 +54,19 @@ function App() {
 }
 
 function StationLanding() {
+  const streamRef = useRef(null);
   const [currentTrack, setCurrentTrack] = useState("OFFLINE");
   const [showTitle, setShowTitle] = useState("");
   const [playing, setPlaying] = useState(false);
+  const [playbackError, setPlaybackError] = useState("");
   useEffect(() => {
     const loadStatus = async () => {
       try {
         const res = await fetch(
-          "https://status.123radio.org/"
+          import.meta.env.VITE_STATUS_URL || "https://status.123radio.org/",
+          { signal: AbortSignal.timeout(8000) }
         );
+        if (!res.ok) throw new Error("Status unavailable");
   
         const data = await res.json();
 
@@ -73,6 +77,7 @@ function StationLanding() {
         );
       } catch {
         setCurrentTrack("OFFLINE");
+        setShowTitle("");
       }
     };
   
@@ -100,7 +105,7 @@ function StationLanding() {
           </header>
 
           <section className="liveSection">
-            <div className="liveLabel">LIVE NOW</div>
+            <div className="liveLabel">{currentTrack === "ON AIR" ? "LIVE NOW" : "OFF AIR"}</div>
 
             <h1 className="liveDate">
               {new Date().toLocaleDateString("en-US", {
@@ -119,15 +124,20 @@ function StationLanding() {
             <div className="playerBar">
               <button
                 className="playButton"
-                onClick={() => {
-                  const audio = document.getElementById("radioStream");
-
+                onClick={async () => {
+                  const audio = streamRef.current;
+                  if (!audio) return;
+                  setPlaybackError("");
                   if (audio.paused) {
-                    audio.play();
-                    setPlaying(true);
+                    try {
+                      audio.load();
+                      await audio.play();
+                    } catch {
+                      setPlaying(false);
+                      setPlaybackError("The stream is unavailable. Please try again shortly.");
+                    }
                   } else {
                     audio.pause();
-                    setPlaying(false);
                   }
                 }}
               >
@@ -135,13 +145,22 @@ function StationLanding() {
               </button>
 
               <audio
+                ref={streamRef}
                 id="radioStream"
                 preload="none"
-                src="https://radio.123radio.org/radio.mp3"
+                src={import.meta.env.VITE_STREAM_URL || "https://radio.123radio.org/radio.mp3"}
+                onPlaying={() => { setPlaying(true); setPlaybackError(""); }}
+                onPause={() => setPlaying(false)}
+                onEnded={() => setPlaying(false)}
+                onError={() => {
+                  setPlaying(false);
+                  setPlaybackError("The stream is unavailable. Please try again shortly.");
+                }}
               />
 
               <div className="streamLabel">{currentTrack}</div>
             </div>
+            {playbackError && <p role="status" className="upcomingEmpty">{playbackError}</p>}
 
             <Chat />
 
@@ -192,8 +211,6 @@ function Deck({ name, side, onFile, onPlayPause, playing, onGain, onEq }) {
   );
 }
 
-const DJ_AUTH_KEY = "dj_authed";
-
 function DjBoothGate({ onAuthed }) {
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
@@ -215,15 +232,14 @@ function DjBoothGate({ onAuthed }) {
 
       const data = await res.json();
 
-      if (data.ok) {
-        sessionStorage.setItem(DJ_AUTH_KEY, "true");
-        onAuthed();
+      if (res.ok && data.ok) {
+        onAuthed(password);
         return;
       }
 
-      setAuthError("Wrong password");
+      setAuthError(res.status === 401 ? "Wrong password" : "Sign-in is temporarily unavailable. Try again.");
     } catch {
-      setAuthError("Wrong password");
+      setAuthError("Could not reach the station. Try again.");
     } finally {
       setSubmitting(false);
     }
@@ -270,18 +286,16 @@ function DjBoothGate({ onAuthed }) {
 }
 
 function CreatorBooth() {
-  const [authed, setAuthed] = useState(
-    () => sessionStorage.getItem(DJ_AUTH_KEY) === "true"
-  );
+  const [djPassword, setDjPassword] = useState("");
 
-  if (!authed) {
-    return <DjBoothGate onAuthed={() => setAuthed(true)} />;
+  if (!djPassword) {
+    return <DjBoothGate onAuthed={setDjPassword} />;
   }
 
-  return <CreatorBoothControls />;
+  return <CreatorBoothControls djPassword={djPassword} />;
 }
 
-function CreatorBoothControls() {
+function CreatorBoothControls({ djPassword }) {
   const ctxRef = useRef(null);
   const audioEls = useRef({ a: null, b: null });
   const deckRefs = useRef({ a: null, b: null });
@@ -377,7 +391,9 @@ function CreatorBoothControls() {
 
   useEffect(() => {
     return () => {
-      localRecorderRef.current?.stop();
+      if (localRecorderRef.current?.state === "recording") localRecorderRef.current.stop();
+      if (broadcastRecorderRef.current?.state === "recording") broadcastRecorderRef.current.stop();
+      socketRef.current?.close(1000, "Broadcast stopped");
       if (recordingBlobUrlRef.current) {
         URL.revokeObjectURL(recordingBlobUrlRef.current);
       }
@@ -561,68 +577,82 @@ function CreatorBoothControls() {
     link.click();
   }
 
-  async function fakeBroadcast() {
-    ensureAudio();
-
-    if (!broadcasting) {
-      try {
-        await fetch("https://status.123radio.org/title", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            title: showTitle
-          })
-        });
-
-        const socket = new WebSocket("wss://broadcast.123radio.org");
-
-        socketRef.current = socket;
-
-        socket.onopen = () => {
-          const recorder = new MediaRecorder(
-            destRef.current.stream,
-            {
-              mimeType: "audio/webm"
-            }
-          );
-
-          broadcastRecorderRef.current = recorder;
-
-          recorder.ondataavailable = (e) => {
-            if (
-              e.data.size > 0 &&
-              socket.readyState === WebSocket.OPEN
-            ) {
-              socket.send(e.data);
-            }
-          };
-
-          recorder.start(250);
-
-          setBroadcasting(true);
-          setStatus("Connected to 123 Radio ingest");
-        };
-
-        socket.onerror = (err) => {
-          console.error(err);
-          setStatus("WebSocket connection failed");
-        };
-
-        socket.onclose = () => {
-          setStatus("Socket disconnected");
-        };
-      } catch (err) {
-        console.error(err);
-        setStatus("Connection error");
-      }
-    } else {
-      broadcastRecorderRef.current?.stop();
-      socketRef.current?.close();
-
+  async function toggleBroadcast() {
+    if (broadcasting) {
+      if (broadcastRecorderRef.current?.state === "recording") broadcastRecorderRef.current.stop();
+      socketRef.current?.close(1000, "Broadcast stopped");
       setBroadcasting(false);
       setStatus("Broadcast stopped");
+      return;
+    }
+
+    const mimeType = getRecordingMimeType();
+    if (!mimeType) {
+      setStatus("Use Chrome or another browser that supports WebM audio to broadcast.");
+      return;
+    }
+    if (!hasActiveAudio()) {
+      setStatus("Load a track or turn on your microphone before going live.");
+      return;
+    }
+
+    try {
+      await ensureAudio().resume();
+      const socket = new WebSocket(import.meta.env.VITE_BROADCAST_URL || "wss://broadcast.123radio.org");
+      socketRef.current = socket;
+      setBroadcasting(true);
+      setStatus("Connecting to 123 Radio…");
+      const connectionTimer = window.setTimeout(() => {
+        socket.close(4000, "Connection timed out");
+      }, 15000);
+
+      socket.onopen = () => {
+        socket.send(JSON.stringify({ type: "authenticate", password: djPassword, title: showTitle }));
+      };
+      socket.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+          if (message.type === "ready" && !broadcastRecorderRef.current) {
+            window.clearTimeout(connectionTimer);
+            const recorder = new MediaRecorder(destRef.current.stream, { mimeType, audioBitsPerSecond: 256000 });
+            broadcastRecorderRef.current = recorder;
+            recorder.ondataavailable = ({ data }) => {
+              if (!data.size || socket.readyState !== WebSocket.OPEN) return;
+              if (socket.bufferedAmount > 1024 * 1024) {
+                socket.close(4001, "Connection too slow");
+                return;
+              }
+              socket.send(data);
+            };
+            recorder.onerror = () => socket.close(4002, "Audio capture failed");
+            recorder.start(250);
+            setStatus("Sending audio — waiting for the live stream…");
+          } else if (message.type === "live") {
+            setStatus("Live on 123 Radio");
+          }
+        } catch {
+          socket.close(4002, "Audio capture failed");
+        }
+      };
+      socket.onerror = () => setStatus("Could not connect to the broadcast server.");
+      socket.onclose = (event) => {
+        window.clearTimeout(connectionTimer);
+        if (broadcastRecorderRef.current?.state === "recording") broadcastRecorderRef.current.stop();
+        broadcastRecorderRef.current = null;
+        if (socketRef.current === socket) socketRef.current = null;
+        setBroadcasting(false);
+        const messages = {
+          1000: "Broadcast stopped",
+          4401: "DJ sign-in expired or was rejected. Refresh the page and sign in again.",
+          4409: "Another DJ is already broadcasting.",
+          4408: "Broadcast stopped because audio stopped arriving.",
+          4001: "Broadcast stopped because the connection was too slow.",
+        };
+        setStatus(messages[event.code] || "Broadcast disconnected. Check your connection and try again.");
+      };
+    } catch {
+      setBroadcasting(false);
+      setStatus("Could not start the broadcast. Check browser audio permissions and try again.");
     }
   }
 
@@ -705,7 +735,7 @@ function CreatorBoothControls() {
             ? "broadcastButton stop"
             : "broadcastButton"
         }
-        onClick={fakeBroadcast}
+        onClick={toggleBroadcast}
       >
         {broadcasting ? "STOP BROADCAST" : "GO LIVE"}
       </button>
