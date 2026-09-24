@@ -62,7 +62,7 @@ export default function UpcomingShows() {
             <li key={`${show.title}-${show.date}-${index}`} className="upcomingItem">
               <p className="upcomingTitle">{show.title}</p>
               <p className="upcomingMeta">
-                {show.date} · {show.startTime} – {show.endTime}
+                {show.date} · {show.startTime} – {show.endTime} ET
               </p>
               {show.description && (
                 <p className="upcomingDescription">{show.description}</p>
